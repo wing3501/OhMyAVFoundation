@@ -1,0 +1,21 @@
+//
+//  MediaItem.h
+//  OhMyAVFoundation
+//
+//  Created by 申屠云飞 on 2018/8/31.
+//  Copyright © 2018年 styf. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "OMMetadata.h"
+typedef void (^OMCompletionHandler)(BOOL complete);
+@interface MediaItem : NSObject
+@property (nonatomic,copy,readonly) NSString *filename;
+@property (nonatomic,copy,readonly) NSString *filetype;
+@property (nonatomic,strong,readonly) OMMetadata *metadata;
+@property (nonatomic,assign,readonly,getter = isEditable) BOOL editable;
+
+- (instancetype)initWithURL:(NSURL *)url;
+- (void)prepareWithCompletionHandler:(OMCompletionHandler)handler;
+- (void)saveWithCompletionHandler:(OMCompletionHandler)handler;
+@end
