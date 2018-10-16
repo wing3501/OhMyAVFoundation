@@ -1,0 +1,90 @@
+//
+//  PrefixHeader.pch
+//  AVFoundationPractice
+//
+//  Created by 申屠云飞 on 2018/10/12.
+//  Copyright © 2018年 styf. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+#define WEAKSELF __weak typeof(self) weakSelf = self;
+#define STRONGSELF __strong typeof(weakSelf) strongSelf = weakSelf;
+#define ScreenBounds [UIScreen mainScreen].bounds
+#define ScreenWidth ScreenBounds.size.width
+#define ScreenHeight ScreenBounds.size.height
+#define IsiOS(n) [[[UIDevice currentDevice] systemVersion] doubleValue] >= n
+#import <AVFoundation/AVFoundation.h>
+#import "YYKit.h"
+#import "Masonry.h"
+
+//单例模式
+// .h文件
+#define SingletonH(name) + (instancetype)shared##name;
+
+// .m文件
+#if __has_feature(objc_arc)
+
+#define SingletonM(name) \
+static id _instace; \
+\
++ (id)allocWithZone:(struct _NSZone *)zone \
+{ \
+static dispatch_once_t onceToken; \
+dispatch_once(&onceToken, ^{ \
+_instace = [super allocWithZone:zone]; \
+}); \
+return _instace; \
+} \
+\
++ (instancetype)shared##name \
+{ \
+static dispatch_once_t onceToken; \
+dispatch_once(&onceToken, ^{ \
+_instace = [[self alloc] init]; \
+}); \
+return _instace; \
+} \
+\
+- (id)copyWithZone:(NSZone *)zone \
+{ \
+return _instace; \
+}
+
+#else
+
+#define SingletonM(name) \
+static id _instace; \
+\
++ (id)allocWithZone:(struct _NSZone *)zone \
+{ \
+static dispatch_once_t onceToken; \
+dispatch_once(&onceToken, ^{ \
+_instace = [super allocWithZone:zone]; \
+}); \
+return _instace; \
+} \
+\
++ (instancetype)shared##name \
+{ \
+static dispatch_once_t onceToken; \
+dispatch_once(&onceToken, ^{ \
+_instace = [[self alloc] init]; \
+}); \
+return _instace; \
+} \
+\
+- (id)copyWithZone:(NSZone *)zone \
+{ \
+return _instace; \
+} \
+\
+- (oneway void)release { } \
+- (id)retain { return self; } \
+- (NSUInteger)retainCount { return 1;} \
+- (id)autorelease { return self;}
+
+#endif
+
+#endif /* PrefixHeader_pch */
