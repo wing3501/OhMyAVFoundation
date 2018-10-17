@@ -50,6 +50,10 @@
 @property (nonatomic,strong) CALayer *overlayLayer;
 /// 人脸的层
 @property (nonatomic,strong) NSMutableDictionary *faceLayers;
+
+//机器码识别
+//机器码的层
+@property (nonatomic,strong) NSMutableDictionary *codeLayers;
 @end
 
 @implementation OMCameraViewController
@@ -309,15 +313,15 @@ static CATransform3D CATransform3DMakePerspective(CGFloat eyePosition) {
 }
 
 /**
- 把设备坐标空间的人脸对象转换为视图空间对象集合
+ 把设备坐标空间的对象转换为视图空间对象集合
  */
-- (NSArray *)transformedFacesFromFaces:(NSArray *)faces {
-    NSMutableArray *transformedFaces = [NSMutableArray array];
-    for (AVMetadataObject *face in faces) {
-        AVMetadataObject *transformedFace = [self.videoPreviewLayer transformedMetadataObjectForMetadataObject:face];
-        [transformedFaces addObject:transformedFace];
+- (NSArray *)transformedObjsFromObjs:(NSArray *)objs {
+    NSMutableArray *transformedObjs = [NSMutableArray array];
+    for (AVMetadataObject *obj in objs) {
+        AVMetadataObject *transformedObj = [self.videoPreviewLayer transformedMetadataObjectForMetadataObject:obj];
+        [transformedObjs addObject:transformedObj];
     }
-    return transformedFaces;
+    return transformedObjs;
 }
 
 /**
@@ -370,6 +374,49 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
     return degrees * M_PI / 180;
 }
 
+/**
+ 创建一个方形图层
+ */
+- (CAShapeLayer *)makeBoundsLayer {
+    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+    shapeLayer.strokeColor = [UIColor colorWithRed:0.95f green:0.75f blue:0.06f alpha:1.0f].CGColor;
+    shapeLayer.fillColor = nil;
+    shapeLayer.lineWidth = 4.0f;
+    return shapeLayer;
+}
+
+- (CAShapeLayer *)makeCornersLayer {
+    CAShapeLayer *cornersLayer = [CAShapeLayer layer];
+    cornersLayer.lineWidth = 2.0f;
+    cornersLayer.strokeColor = [UIColor colorWithRed:0.172 green:0.671 blue:0.428 alpha:1.000].CGColor;
+    cornersLayer.fillColor = [UIColor colorWithRed:0.190 green:0.753 blue:0.489 alpha:0.500].CGColor;
+    return cornersLayer;
+}
+
+- (UIBezierPath *)bezierPathForBounds:(CGRect)bounds {
+    return [UIBezierPath bezierPathWithRect:bounds];
+}
+
+- (UIBezierPath *)bezierPathForCorners:(NSArray *)corners {
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    for (int i = 0; i < corners.count; i++) {
+        CGPoint point = [self pointForCorner:corners[i]];
+        if (i == 0) {
+            [path moveToPoint:point];
+        } else {
+            [path addLineToPoint:point];
+        }
+    }
+    [path closePath];
+    return path;
+}
+
+- (CGPoint)pointForCorner:(NSDictionary *)corner {
+    NSLog(@"%@", corner);
+    CGPoint point;
+    CGPointMakeWithDictionaryRepresentation((CFDictionaryRef)corner, &point);
+    return point;
+}
 #pragma mark - OMCircleProgressViewDelegate
 
 - (void)progressViewDidSingleTap:(OMCircleProgressView *)progressView {
@@ -400,7 +447,7 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
  */
 - (void)didDetectFaces:(NSArray *)faces {
     
-    NSArray *transformedFaces = [self transformedFacesFromFaces:faces];
+    NSArray *transformedFaces = [self transformedObjsFromObjs:faces];
     
     NSMutableArray *lostFaces = [self.faceLayers.allKeys mutableCopy];//存放移出屏幕的人脸
     for (AVMetadataFaceObject *face in transformedFaces) {
@@ -434,6 +481,51 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
         CALayer *layer = [self.faceLayers objectForKey:faceID];
         [layer removeFromSuperlayer];
         [self.faceLayers removeObjectForKey:faceID];
+    }
+}
+
+/**
+ 检测到机器码
+ */
+- (void)didDetectCodes:(NSArray *)codes {
+    NSArray *transformedCodes = [self transformedObjsFromObjs:codes];
+    NSMutableArray *lostCodes = [self.codeLayers.allKeys mutableCopy];
+    for (AVMetadataMachineReadableCodeObject *code in transformedCodes) {
+        
+        NSString *stringValue = code.stringValue;
+        if (stringValue) {
+            [lostCodes removeObject:stringValue];
+        } else {
+            continue;
+        }
+        
+        NSArray *layers = self.codeLayers[stringValue];
+        
+        if (!layers) {
+            // no layers for stringValue, create new code layers
+            layers = @[[self makeBoundsLayer], [self makeCornersLayer]];
+            
+            self.codeLayers[stringValue] = layers;
+            [self.overlayLayer addSublayer:layers[0]];
+            [self.overlayLayer addSublayer:layers[1]];
+        }
+        
+        CAShapeLayer *boundsLayer  = layers[0];
+        boundsLayer.path  = [self bezierPathForBounds:code.bounds].CGPath;
+        boundsLayer.hidden = NO;
+        
+        CAShapeLayer *cornersLayer = layers[1];
+        cornersLayer.path = [self bezierPathForCorners:code.corners].CGPath;
+        cornersLayer.hidden = NO;
+        
+        NSLog(@"String: %@", stringValue);
+    }
+    
+    for (NSString *stringValue in lostCodes) {
+        for (CALayer *layer in self.codeLayers[stringValue]) {
+            [layer removeFromSuperlayer];
+        }
+        [self.codeLayers removeObjectForKey:stringValue];
     }
 }
 #pragma mark - getter and setter
@@ -602,4 +694,12 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
     }
     return _overlayLayer;
 }
+
+- (NSMutableDictionary *)codeLayers {
+    if (!_codeLayers) {
+        _codeLayers = @{}.mutableCopy;
+    }
+    return _codeLayers;
+}
+
 @end

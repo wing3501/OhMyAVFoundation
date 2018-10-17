@@ -54,6 +54,11 @@ static const CGFloat kMaxZoomFactor = 4.0f;
  检测到人脸
  */
 - (void)didDetectFaces:(NSArray *)faces;
+
+/**
+ 检测到机器码
+ */
+- (void)didDetectCodes:(NSArray *)codes;
 @end
 
 @interface OMCameraManager : NSObject

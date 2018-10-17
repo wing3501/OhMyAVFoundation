@@ -11,6 +11,10 @@
 #import <AVFoundation/AVFoundation.h>
 #import "OMAssetsLibraryTool.h"
 #import "NSFileManager+Ext.h"
+//人脸识别开关
+#define FaceScanON NO
+//机器码识别开关
+#define CodeScanON NO
 
 static const CGFloat OMZoomRate = 1.f;
 
@@ -106,16 +110,32 @@ static const NSString *OMRampingVideoZoomFactorContext;
     }
     
     //设置元数据输出
-    self.metadataOutput = [[AVCaptureMetadataOutput alloc] init];
-    if ([self.captureSession canAddOutput:self.metadataOutput]) {
-        [self.captureSession addOutput:self.metadataOutput];
-        
-        NSArray *metadataObjectTypes = @[AVMetadataObjectTypeFace];//设置人脸识别元数据类型
-        self.metadataOutput.metadataObjectTypes = metadataObjectTypes;
-        
-        dispatch_queue_t mainQueue = dispatch_get_main_queue();
-        [self.metadataOutput setMetadataObjectsDelegate:self queue:mainQueue];//人脸识别检测用到硬件加速，而且很多任务需要在主线程执行
-        return YES;
+    if (FaceScanON || CodeScanON) {
+        self.metadataOutput = [[AVCaptureMetadataOutput alloc] init];
+        if ([self.captureSession canAddOutput:self.metadataOutput]) {
+            [self.captureSession addOutput:self.metadataOutput];
+            
+            if (FaceScanON) {
+                NSArray *metadataObjectTypes = @[AVMetadataObjectTypeFace];//设置人脸识别元数据类型
+                self.metadataOutput.metadataObjectTypes = metadataObjectTypes;
+            }else if (CodeScanON) {
+                NSArray *types = @[AVMetadataObjectTypeQRCode,
+                                   AVMetadataObjectTypeAztecCode,
+                                   AVMetadataObjectTypeUPCECode];
+                self.metadataOutput.metadataObjectTypes = types;
+            }
+            dispatch_queue_t mainQueue = dispatch_get_main_queue();
+            [self.metadataOutput setMetadataObjectsDelegate:self queue:mainQueue];//人脸识别检测用到硬件加速，而且很多任务需要在主线程执行
+            return YES;
+        }
+    }
+    
+    //约束对焦范围,提交近距离识别机器码成功率
+    if (self.activeCamera.autoFocusRangeRestrictionSupported || CodeScanON) {
+        if ([self.activeCamera lockForConfiguration:error]) {
+            self.activeCamera.autoFocusRangeRestriction = AVCaptureAutoFocusRangeRestrictionNear;
+            [self.activeCamera unlockForConfiguration];
+        }
     }
     
     //缩放监听
@@ -718,12 +738,18 @@ static const NSString *OMRampingVideoZoomFactorContext;
 
 - (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection {
     
-    for (AVMetadataFaceObject *face in metadataObjects) {
-        NSLog(@"Face detected with ID: %li", (long)face.faceID);
-        NSLog(@"Face bounds: %@", NSStringFromCGRect(face.bounds));
-    }
-    if ([self.delegate respondsToSelector:@selector(didDetectFaces:)]) {
-        [self.delegate didDetectFaces:metadataObjects];
+    if (FaceScanON) {
+        for (AVMetadataFaceObject *face in metadataObjects) {
+            NSLog(@"Face detected with ID: %li", (long)face.faceID);
+            NSLog(@"Face bounds: %@", NSStringFromCGRect(face.bounds));
+        }
+        if ([self.delegate respondsToSelector:@selector(didDetectFaces:)]) {
+            [self.delegate didDetectFaces:metadataObjects];
+        }
+    }else if (CodeScanON) {
+        if ([self.delegate respondsToSelector:@selector(didDetectCodes:)]) {
+            [self.delegate didDetectCodes:metadataObjects];
+        }
     }
 }
 
