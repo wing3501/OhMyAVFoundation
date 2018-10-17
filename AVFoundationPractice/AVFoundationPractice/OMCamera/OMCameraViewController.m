@@ -411,6 +411,9 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
     return path;
 }
 
+/**
+ 字典转点
+ */
 - (CGPoint)pointForCorner:(NSDictionary *)corner {
     NSLog(@"%@", corner);
     CGPoint point;
