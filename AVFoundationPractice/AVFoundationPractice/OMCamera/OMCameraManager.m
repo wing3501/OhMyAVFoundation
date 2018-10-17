@@ -19,11 +19,11 @@ static const NSString *OMRampingVideoZoomContext;
 static const NSString *OMRampingVideoZoomFactorContext;
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-@interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate>
+@interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate>
 /// 静态图输出
 @property (nonatomic,strong) AVCapturePhotoOutput *imageOutput;
 #else
-@interface OMCameraManager()<AVCaptureFileOutputRecordingDelegate>
+@interface OMCameraManager()<AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate>
 /// 静态图输出
 @property (nonatomic,strong) AVCaptureStillImageOutput *imageOutput;
 #endif
@@ -34,6 +34,8 @@ static const NSString *OMRampingVideoZoomFactorContext;
 @property (nonatomic,weak) AVCaptureDeviceInput *activeVideoInput;
 /// 视频输出
 @property (nonatomic,strong) AVCaptureMovieFileOutput *movieOutput;
+/// 元数据输出
+@property (nonatomic,strong) AVCaptureMetadataOutput *metadataOutput;
 /// 视频输出URL
 @property (nonatomic,strong) NSURL *outputURL;
 /// 视频队列
@@ -101,6 +103,19 @@ static const NSString *OMRampingVideoZoomFactorContext;
 //    self.movieOutput.movieFragmentInterval = CMTimeMake(10, 1);//每隔10秒写入片段
     if ([self.captureSession canAddOutput:self.movieOutput]) {
         [self.captureSession addOutput:self.movieOutput];
+    }
+    
+    //设置元数据输出
+    self.metadataOutput = [[AVCaptureMetadataOutput alloc] init];
+    if ([self.captureSession canAddOutput:self.metadataOutput]) {
+        [self.captureSession addOutput:self.metadataOutput];
+        
+        NSArray *metadataObjectTypes = @[AVMetadataObjectTypeFace];//设置人脸识别元数据类型
+        self.metadataOutput.metadataObjectTypes = metadataObjectTypes;
+        
+        dispatch_queue_t mainQueue = dispatch_get_main_queue();
+        [self.metadataOutput setMetadataObjectsDelegate:self queue:mainQueue];//人脸识别检测用到硬件加速，而且很多任务需要在主线程执行
+        return YES;
     }
     
     //缩放监听
@@ -697,6 +712,19 @@ static const NSString *OMRampingVideoZoomFactorContext;
         [self writeVideoToAssetsLibrary:[self.outputURL copy]];
     }
     self.outputURL = nil;
+}
+
+#pragma mark - AVCaptureMetadataOutputObjectsDelegate
+
+- (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection {
+    
+    for (AVMetadataFaceObject *face in metadataObjects) {
+        NSLog(@"Face detected with ID: %li", (long)face.faceID);
+        NSLog(@"Face bounds: %@", NSStringFromCGRect(face.bounds));
+    }
+    if ([self.delegate respondsToSelector:@selector(didDetectFaces:)]) {
+        [self.delegate didDetectFaces:metadataObjects];
+    }
 }
 
 #pragma mark - private

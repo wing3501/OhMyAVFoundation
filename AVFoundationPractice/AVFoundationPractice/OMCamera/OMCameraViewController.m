@@ -44,6 +44,12 @@
 @property (nonatomic,strong) UIButton *zoomMaxButton;
 /// 缩放变小
 @property (nonatomic,strong) UIButton *zoomMinButton;
+
+//人脸识别
+/// 浮层
+@property (nonatomic,strong) CALayer *overlayLayer;
+/// 人脸的层
+@property (nonatomic,strong) NSMutableDictionary *faceLayers;
 @end
 
 @implementation OMCameraViewController
@@ -63,6 +69,9 @@
     if ([self.cameraManager setupSession:&error]) {
         [self.cameraManager startSession];
         [self.view.layer addSublayer:self.videoPreviewLayer];
+        
+        //人脸识别图层
+        [self.videoPreviewLayer addSublayer:self.overlayLayer];
     } else {
         NSLog(@"Error: %@", [error localizedDescription]);
     }
@@ -238,6 +247,9 @@ static float currentScale = 1;
     }
 }
 
+/**
+ 对焦、曝光动画
+ */
 - (void)runBoxAnimationOnView:(UIView *)view point:(CGPoint)point {
     view.center = point;
     view.hidden = NO;
@@ -257,6 +269,9 @@ static float currentScale = 1;
                      }];
 }
 
+/**
+ 重置对焦、曝光动画
+ */
 - (void)runResetAnimation {
     
     CGPoint centerPoint = [self.videoPreviewLayer pointForCaptureDevicePointOfInterest:CGPointMake(0.5f, 0.5f)];
@@ -284,6 +299,77 @@ static float currentScale = 1;
                      }];
 }
 
+/**
+ 应用视角转换
+ */
+static CATransform3D CATransform3DMakePerspective(CGFloat eyePosition) {
+    CATransform3D transform = CATransform3DIdentity;
+    transform.m34 = -1.0 / eyePosition;
+    return transform;
+}
+
+/**
+ 把设备坐标空间的人脸对象转换为视图空间对象集合
+ */
+- (NSArray *)transformedFacesFromFaces:(NSArray *)faces {
+    NSMutableArray *transformedFaces = [NSMutableArray array];
+    for (AVMetadataObject *face in faces) {
+        AVMetadataObject *transformedFace = [self.videoPreviewLayer transformedMetadataObjectForMetadataObject:face];
+        [transformedFaces addObject:transformedFace];
+    }
+    return transformedFaces;
+}
+
+/**
+ 创建一个人脸图层
+ */
+- (CALayer *)makeFaceLayer {
+    CALayer *layer = [CALayer layer];
+    layer.borderWidth = 5.0f;
+    layer.borderColor =
+    [UIColor colorWithRed:0.188 green:0.517 blue:0.877 alpha:1.000].CGColor;
+    return layer;
+}
+
+// Rotate around Z-axis
+- (CATransform3D)transformForRollAngle:(CGFloat)rollAngleInDegrees {
+    CGFloat rollAngleInRadians = OMDegreesToRadians(rollAngleInDegrees);
+    return CATransform3DMakeRotation(rollAngleInRadians, 0.0f, 0.0f, 1.0f);
+}
+
+// Rotate around Y-axis
+- (CATransform3D)transformForYawAngle:(CGFloat)yawAngleInDegrees {
+    CGFloat yawAngleInRadians = OMDegreesToRadians(yawAngleInDegrees);
+    CATransform3D yawTransform = CATransform3DMakeRotation(yawAngleInRadians, 0.0f, -1.0f, 0.0f);
+    return CATransform3DConcat(yawTransform, [self orientationTransform]);//需要为设备方向计算一个相应的旋转变换，否则人脸的偏转将不正确
+}
+
+- (CATransform3D)orientationTransform {
+    CGFloat angle = 0.0;
+    switch ([UIDevice currentDevice].orientation) {
+        case UIDeviceOrientationPortraitUpsideDown:
+            angle = M_PI;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            angle = -M_PI / 2.0f;
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            angle = M_PI / 2.0f;
+            break;
+        default: // as UIDeviceOrientationPortrait
+            angle = 0.0;
+            break;
+    }
+    return CATransform3DMakeRotation(angle, 0.0f, 0.0f, 1.0f);
+}
+
+/**
+ 弧度
+ */
+static CGFloat OMDegreesToRadians(CGFloat degrees) {
+    return degrees * M_PI / 180;
+}
+
 #pragma mark - OMCircleProgressViewDelegate
 
 - (void)progressViewDidSingleTap:(OMCircleProgressView *)progressView {
@@ -306,10 +392,50 @@ static float currentScale = 1;
  @param value 0-1
  */
 - (void)rampedZoomToValue:(CGFloat)value {
-    
     NSLog(@"delegate rampedZoomToValue:%f",value);
 }
 
+/**
+ 检测到人脸
+ */
+- (void)didDetectFaces:(NSArray *)faces {
+    
+    NSArray *transformedFaces = [self transformedFacesFromFaces:faces];
+    
+    NSMutableArray *lostFaces = [self.faceLayers.allKeys mutableCopy];//存放移出屏幕的人脸
+    for (AVMetadataFaceObject *face in transformedFaces) {
+        
+        NSNumber *faceID = @(face.faceID);
+        [lostFaces removeObject:faceID];
+        
+        CALayer *layer = [self.faceLayers objectForKey:faceID];
+        if (!layer) {
+            // no layer for faceID, create new face layer
+            layer = [self makeFaceLayer];
+            [self.overlayLayer addSublayer:layer];
+            self.faceLayers[faceID] = layer;
+        }
+        
+        layer.transform = CATransform3DIdentity;
+        layer.frame = face.bounds;
+        
+        if (face.hasRollAngle) {
+            CATransform3D t = [self transformForRollAngle:face.rollAngle];
+            layer.transform = CATransform3DConcat(layer.transform, t);
+        }
+        
+        if (face.hasYawAngle) {
+            CATransform3D t = [self transformForYawAngle:face.yawAngle];
+            layer.transform = CATransform3DConcat(layer.transform, t);
+        }
+    }
+    
+    for (NSNumber *faceID in lostFaces) {//移出丢失的人脸图层
+        CALayer *layer = [self.faceLayers objectForKey:faceID];
+        [layer removeFromSuperlayer];
+        [self.faceLayers removeObjectForKey:faceID];
+    }
+}
 #pragma mark - getter and setter
 
 - (OMCameraManager *)cameraManager {
@@ -461,4 +587,19 @@ static float currentScale = 1;
     return _zoomMinButton;
 }
 
+- (NSMutableDictionary *)faceLayers {
+    if (!_faceLayers) {
+        _faceLayers = @{}.mutableCopy;
+    }
+    return _faceLayers;
+}
+
+- (CALayer *)overlayLayer {
+    if (!_overlayLayer) {
+        _overlayLayer = [CALayer layer];
+        _overlayLayer.frame = self.view.bounds;
+        _overlayLayer.sublayerTransform = CATransform3DMakePerspective(1000);
+    }
+    return _overlayLayer;
+}
 @end

@@ -49,6 +49,11 @@ static const CGFloat kMaxZoomFactor = 4.0f;
  @param value 0-1
  */
 - (void)rampedZoomToValue:(CGFloat)value;
+
+/**
+ 检测到人脸
+ */
+- (void)didDetectFaces:(NSArray *)faces;
 @end
 
 @interface OMCameraManager : NSObject
