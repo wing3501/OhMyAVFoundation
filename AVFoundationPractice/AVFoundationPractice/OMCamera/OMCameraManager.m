@@ -12,6 +12,12 @@
 #import "OMAssetsLibraryTool.h"
 #import "NSFileManager+Ext.h"
 
+static const CGFloat OMZoomRate = 1.f;
+
+static const NSString *OMCameraAdjustingExposureContext;
+static const NSString *OMRampingVideoZoomContext;
+static const NSString *OMRampingVideoZoomFactorContext;
+
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate>
 /// 静态图输出
@@ -97,6 +103,15 @@
         [self.captureSession addOutput:self.movieOutput];
     }
     
+    //缩放监听
+    [self.activeCamera addObserver:self
+                        forKeyPath:@"videoZoomFactor"
+                           options:0
+                           context:&OMRampingVideoZoomFactorContext];
+    [self.activeCamera addObserver:self
+                        forKeyPath:@"rampingVideoZoom"
+                           options:0
+                           context:&OMRampingVideoZoomContext];
     return YES;
 }
 
@@ -475,9 +490,6 @@
     return [[self activeCamera] isExposurePointOfInterestSupported];
 }
 
-// Define KVO context pointer for observing 'adjustingExposure" device property.
-static const NSString *OMCameraAdjustingExposureContext;
-
 /**
  曝光
  */
@@ -499,41 +511,6 @@ static const NSString *OMCameraAdjustingExposureContext;
         } else {
             [self.delegate deviceConfigurationFailedWithError:error];
         }
-    }
-}
-
-/**
- KVO观察曝光调整何时完成
- */
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary *)change
-                       context:(void *)context {
-    if (context == &OMCameraAdjustingExposureContext) {
-        AVCaptureDevice *device = (AVCaptureDevice *)object;
-        //设备不再调整曝光等级
-        if (!device.isAdjustingExposure && [device isExposureModeSupported:AVCaptureExposureModeLocked]) {
-            [object removeObserver:self
-                        forKeyPath:@"adjustingExposure"
-                           context:&OMCameraAdjustingExposureContext];
-            //切到主线程去锁定当前曝光等级
-            WEAKSELF
-            dispatch_async(dispatch_get_main_queue(), ^{
-                STRONGSELF
-                NSError *error;
-                if ([device lockForConfiguration:&error]) {
-                    device.exposureMode = AVCaptureExposureModeLocked;
-                    [device unlockForConfiguration];
-                } else {
-                    [strongSelf.delegate deviceConfigurationFailedWithError:error];
-                }
-            });
-        }
-    } else {
-        [super observeValueForKeyPath:keyPath
-                             ofObject:object
-                               change:change
-                              context:context];
     }
 }
 
@@ -564,6 +541,127 @@ static const NSString *OMCameraAdjustingExposureContext;
         [self.delegate deviceConfigurationFailedWithError:error];
     }
 }
+
+#pragma mark - Zoom
+
+/**
+ 当前摄像头是否支持缩放
+ */
+- (BOOL)cameraSupportsZoom {
+    return self.activeCamera.activeFormat.videoMaxZoomFactor > 1.0f;
+}
+
+/**
+ 最大的缩放因子
+ */
+- (CGFloat)maxZoomFactor {
+    return MIN(self.activeCamera.activeFormat.videoMaxZoomFactor, kMaxZoomFactor);//这个最大值是自定义的
+}
+
+/**
+ 设置缩放
+ */
+- (void)setZoomValue:(CGFloat)zoomValue {
+//    NSLog(@"设置缩放=====================>%f",zoomValue);
+    if (!self.activeCamera.isRampingVideoZoom) {
+        NSError *error;
+        if ([self.activeCamera lockForConfiguration:&error]) {
+            // Provide linear feel to zoom slider
+//            CGFloat zoomFactor = pow([self maxZoomFactor], zoomValue);
+//            self.activeCamera.videoZoomFactor = zoomFactor;
+            
+            self.activeCamera.videoZoomFactor = zoomValue;
+            [self.activeCamera unlockForConfiguration];
+        } else {
+            [self.delegate deviceConfigurationFailedWithError:error];
+        }
+    }
+}
+
+
+/**
+ 逐渐缩放
+ */
+- (void)rampZoomToValue:(CGFloat)zoomValue {
+    CGFloat zoomFactor = pow([self maxZoomFactor], zoomValue);
+    NSError *error;
+    if ([self.activeCamera lockForConfiguration:&error]) {
+        [self.activeCamera rampToVideoZoomFactor:zoomFactor withRate:OMZoomRate];//每次增加1X
+        [self.activeCamera unlockForConfiguration];
+    } else {
+        [self.delegate deviceConfigurationFailedWithError:error];
+    }
+}
+
+/**
+ 取消缩放
+ */
+- (void)cancelZoom {
+    NSError *error;
+    if ([self.activeCamera lockForConfiguration:&error]) {
+        [self.activeCamera cancelVideoZoomRamp];
+        [self.activeCamera unlockForConfiguration];
+    } else {
+        [self.delegate deviceConfigurationFailedWithError:error];
+    }
+}
+
+/**
+ 更新代理
+ */
+- (void)updateZoomingDelegate {
+    CGFloat curZoomFactor = self.activeCamera.videoZoomFactor;
+    CGFloat maxZoomFactor = [self maxZoomFactor];
+    CGFloat value = log(curZoomFactor) / log(maxZoomFactor);
+    if ([self.delegate respondsToSelector:@selector(rampedZoomToValue:)]) {
+//        [self.delegate rampedZoomToValue:value];
+        [self.delegate rampedZoomToValue:curZoomFactor];
+    }
+}
+#pragma mark - KVO
+
+/**
+ KVO
+ */
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+    if (context == &OMCameraAdjustingExposureContext) {
+        //KVO观察曝光调整何时完成
+        AVCaptureDevice *device = (AVCaptureDevice *)object;
+        //设备不再调整曝光等级
+        if (!device.isAdjustingExposure && [device isExposureModeSupported:AVCaptureExposureModeLocked]) {
+            [object removeObserver:self
+                        forKeyPath:@"adjustingExposure"
+                           context:&OMCameraAdjustingExposureContext];
+            //切到主线程去锁定当前曝光等级
+            WEAKSELF
+            dispatch_async(dispatch_get_main_queue(), ^{
+                STRONGSELF
+                NSError *error;
+                if ([device lockForConfiguration:&error]) {
+                    device.exposureMode = AVCaptureExposureModeLocked;
+                    [device unlockForConfiguration];
+                } else {
+                    [strongSelf.delegate deviceConfigurationFailedWithError:error];
+                }
+            });
+        }
+    } else if (context == &OMRampingVideoZoomContext) {
+        [self updateZoomingDelegate];
+    } else if (context == &OMRampingVideoZoomFactorContext) {
+        if (self.activeCamera.isRampingVideoZoom) {
+            [self updateZoomingDelegate];
+        }
+    } else {
+        [super observeValueForKeyPath:keyPath
+                             ofObject:object
+                               change:change
+                              context:context];
+    }
+}
+
 #pragma mark - AVCapturePhotoCaptureDelegate
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0

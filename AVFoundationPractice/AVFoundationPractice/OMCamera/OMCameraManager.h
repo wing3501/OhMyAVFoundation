@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+static const CGFloat kMaxZoomFactor = 4.0f;
+
 @protocol OMCameraManagerDelegate <NSObject>
 @optional
 /**
@@ -24,12 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
  写入到相册出现异常
  */
 - (void)assetLibraryWriteFailedWithError:(NSError *)error;
-
 /**
  拍照
  */
 - (void)captureStillImage:(UIImage *)image;
-
 /**
  拍视频
 
@@ -42,6 +42,13 @@ NS_ASSUME_NONNULL_BEGIN
  @param thumbnail 缩略图
  */
 - (void)thumbnailgenerated:(UIImage *)thumbnail;
+
+/**
+ 缩放回调
+
+ @param value 0-1
+ */
+- (void)rampedZoomToValue:(CGFloat)value;
 @end
 
 @interface OMCameraManager : NSObject
@@ -84,20 +91,36 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSUInteger cameraCount;
 
 //*****************************手电筒和闪光灯*****************************
-
+/// 当前摄像头是否支持手电筒
 @property (nonatomic, readonly) BOOL cameraHasTorch;
+/// 当前摄像头是否支持闪光灯
 @property (nonatomic, readonly) BOOL cameraHasFlash;
+/// 当前摄像头的手电筒模式
 @property (nonatomic) AVCaptureTorchMode torchMode;
+/// 当前摄像头的闪光灯模式
 @property (nonatomic) AVCaptureFlashMode flashMode;
 
 //*****************************对焦和曝光*****************************
-
+/// 当前摄像头是否支持对焦
 @property (nonatomic, readonly) BOOL cameraSupportsTapToFocus;
+/// 当前摄像头是否支持曝光
 @property (nonatomic, readonly) BOOL cameraSupportsTapToExpose;
+/// 对焦
 - (void)focusAtPoint:(CGPoint)point;
+/// 曝光
 - (void)exposeAtPoint:(CGPoint)point;
+/// 复原对焦和曝光模式
 - (void)resetFocusAndExposureModes;
 
+//*****************************缩放*****************************
+/// 当前摄像头是否支持缩放
+- (BOOL)cameraSupportsZoom;
+/// 设置缩放
+- (void)setZoomValue:(CGFloat)zoomValue;
+/// 逐渐缩放
+- (void)rampZoomToValue:(CGFloat)zoomValue;
+/// 取消缩放
+- (void)cancelZoom;
 //*****************************图片捕捉*****************************
 
 /**

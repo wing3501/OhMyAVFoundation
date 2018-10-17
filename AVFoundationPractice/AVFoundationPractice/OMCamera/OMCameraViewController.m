@@ -24,17 +24,26 @@
 @property (nonatomic,strong) UIButton *torchButton;
 /// 闪光灯按钮
 @property (nonatomic,strong) UIButton *flashButton;
+
 // 对焦和曝光
 /// 对焦动画视图
-@property (strong, nonatomic) UIView *focusBox;
+@property (nonatomic,strong) UIView *focusBox;
 /// 曝光动画视图
-@property (strong, nonatomic) UIView *exposureBox;
+@property (nonatomic,strong) UIView *exposureBox;
 /// 单击对焦
-@property (strong, nonatomic) UITapGestureRecognizer *singleTapRecognizer;
+@property (nonatomic,strong) UITapGestureRecognizer *singleTapRecognizer;
 /// 双击曝光
-@property (strong, nonatomic) UITapGestureRecognizer *doubleTapRecognizer;
+@property (nonatomic,strong) UITapGestureRecognizer *doubleTapRecognizer;
 /// 双指双击复原
-@property (strong, nonatomic) UITapGestureRecognizer *doubleDoubleTapRecognizer;
+@property (nonatomic,strong) UITapGestureRecognizer *doubleDoubleTapRecognizer;
+
+// 缩放
+/// 缩放手势
+@property (strong, nonatomic) UIPinchGestureRecognizer *pinchGestureRecognizer;
+/// 缩放变大
+@property (nonatomic,strong) UIButton *zoomMaxButton;
+/// 缩放变小
+@property (nonatomic,strong) UIButton *zoomMinButton;
 @end
 
 @implementation OMCameraViewController
@@ -76,6 +85,10 @@
     [self.view addGestureRecognizer:self.doubleDoubleTapRecognizer];
     [self.view addSubview:self.focusBox];
     [self.view addSubview:self.exposureBox];
+    
+    [self.view addGestureRecognizer:self.pinchGestureRecognizer];
+    [self.view addSubview:self.zoomMaxButton];
+    [self.view addSubview:self.zoomMinButton];
 }
 
 #pragma mark - overwrite
@@ -142,6 +155,65 @@
     [self.cameraManager resetFocusAndExposureModes];
 }
 
+/**
+ 缩放
+ */
+static float currentScale = 1;
+- (void)handlepinch:(UIPinchGestureRecognizer *)pinchGesture {
+    if (UIGestureRecognizerStateBegan == pinchGesture.state ||
+        UIGestureRecognizerStateChanged == pinchGesture.state) {
+        
+        // Use the x or y scale, they should be the same for typical zooming (non-skewing)
+        // Variables to adjust the max/min values of zoom
+        float minScale = 1.0;
+        float maxScale = kMaxZoomFactor;
+        float zoomSpeed = .5;
+        
+        float deltaScale = pinchGesture.scale;
+        
+        // You need to translate the zoom to 0 (origin) so that you
+        // can multiply a speed factor and then translate back to "zoomSpace" around 1
+        deltaScale = ((deltaScale - 1) * zoomSpeed) + 1;
+        
+        // Limit to min/max size (i.e maxScale = 2, current scale = 2, 2/2 = 1.0)
+        //  A deltaScale is ~0.99 for decreasing or ~1.01 for increasing
+        //  A deltaScale of 1.0 will maintain the zoom size
+        deltaScale = MIN(deltaScale, maxScale / currentScale);
+        deltaScale = MAX(deltaScale, minScale / currentScale);
+        
+        float scale = currentScale * deltaScale;
+        if (scale != currentScale) {
+            currentScale = scale;
+            //缩放
+            [self.cameraManager setZoomValue:currentScale];
+        }
+        
+        // Reset to 1 for scale delta's
+        //  Note: not 0, or we won't see a size: 0 * width = 0
+        pinchGesture.scale = 1;
+    }
+}
+
+/**
+ 缩放变大
+ */
+- (void)zoomMax {
+    [self.cameraManager rampZoomToValue:1];
+}
+
+/**
+ 缩放变小
+ */
+- (void)zoomMin {
+    [self.cameraManager rampZoomToValue:0];
+}
+
+/**
+ 停止缩放
+ */
+- (void)cancelZoom {
+    [self.cameraManager cancelZoom];
+}
 #pragma mark - private
 
 - (NSString *)torchStatus {
@@ -224,6 +296,18 @@
 
 - (void)progressViewStopCountDown:(OMCircleProgressView *)progressView {
     [self.cameraManager stopRecording];//停止录制视频
+}
+
+#pragma mark - OMCameraManagerDelegate
+
+/**
+ 缩放回调
+ 
+ @param value 0-1
+ */
+- (void)rampedZoomToValue:(CGFloat)value {
+    
+    NSLog(@"delegate rampedZoomToValue:%f",value);
 }
 
 #pragma mark - getter and setter
@@ -347,4 +431,34 @@
     }
     return _exposureBox;
 }
+
+- (UIPinchGestureRecognizer *)pinchGestureRecognizer {
+    if (!_pinchGestureRecognizer) {
+        _pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(handlepinch:)];
+    }
+    return _pinchGestureRecognizer;
+}
+
+- (UIButton *)zoomMaxButton {
+    if (!_zoomMaxButton) {
+        _zoomMaxButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_zoomMaxButton setImage:[UIImage imageNamed:@"max_button"] forState:UIControlStateNormal];
+        [_zoomMaxButton addTarget:self action:@selector(zoomMax) forControlEvents:UIControlEventTouchDown];
+        [_zoomMaxButton addTarget:self action:@selector(cancelZoom) forControlEvents:UIControlEventTouchUpInside];
+        _zoomMaxButton.frame = CGRectMake(30, 70, 40, 40);
+    }
+    return _zoomMaxButton;
+}
+
+- (UIButton *)zoomMinButton {
+    if (!_zoomMinButton) {
+        _zoomMinButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_zoomMinButton setImage:[UIImage imageNamed:@"min_button"] forState:UIControlStateNormal];
+        [_zoomMinButton addTarget:self action:@selector(zoomMin) forControlEvents:UIControlEventTouchDown];
+        [_zoomMinButton addTarget:self action:@selector(cancelZoom) forControlEvents:UIControlEventTouchUpInside];
+        _zoomMinButton.frame = CGRectMake(110, 70, 40, 40);
+    }
+    return _zoomMinButton;
+}
+
 @end
