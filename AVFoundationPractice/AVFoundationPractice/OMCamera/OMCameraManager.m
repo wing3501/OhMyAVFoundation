@@ -18,6 +18,8 @@
 #define CodeScanON NO
 //高帧率捕捉开关
 #define HighFrameRateON NO
+//视频帧处理输出开关
+#define VideoDataOutputON NO
 
 static const CGFloat OMZoomRate = 1.f;
 
@@ -112,6 +114,16 @@ static const NSString *OMRampingVideoZoomFactorContext;
 //    self.movieOutput.movieFragmentInterval = CMTimeMake(10, 1);//每隔10秒写入片段
     if ([self.captureSession canAddOutput:self.movieOutput]) {
         [self.captureSession addOutput:self.movieOutput];
+    }
+    
+    if (VideoDataOutputON) {
+        self.videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
+        self.videoDataOutput.alwaysDiscardsLateVideoFrames = YES;
+        self.videoDataOutput.videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};
+        [self.videoDataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
+        if ([self.captureSession canAddOutput:self.videoDataOutput]) {
+            [self.captureSession addOutput:self.videoDataOutput];
+        }
     }
     
     //设置元数据输出
