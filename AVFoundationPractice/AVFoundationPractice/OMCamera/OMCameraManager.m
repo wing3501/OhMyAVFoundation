@@ -26,11 +26,11 @@ static const NSString *OMRampingVideoZoomContext;
 static const NSString *OMRampingVideoZoomFactorContext;
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-@interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate>
+@interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate>
 /// 静态图输出
 @property (nonatomic,strong) AVCapturePhotoOutput *imageOutput;
 #else
-@interface OMCameraManager()<AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate>
+@interface OMCameraManager()<AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate>
 /// 静态图输出
 @property (nonatomic,strong) AVCaptureStillImageOutput *imageOutput;
 #endif
@@ -39,8 +39,10 @@ static const NSString *OMRampingVideoZoomFactorContext;
 @property (nonatomic,strong) AVCaptureSession *captureSession;
 /// 当前活跃的设备输入
 @property (nonatomic,weak) AVCaptureDeviceInput *activeVideoInput;
-/// 视频输出
+/// 视频文件输出
 @property (nonatomic,strong) AVCaptureMovieFileOutput *movieOutput;
+/// 视频数据输出(帧处理)
+@property (nonatomic,strong) AVCaptureVideoDataOutput *videoDataOutput;
 /// 元数据输出
 @property (nonatomic,strong) AVCaptureMetadataOutput *metadataOutput;
 /// 视频输出URL
@@ -760,6 +762,21 @@ static const NSString *OMRampingVideoZoomFactorContext;
     }
 }
 
+#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
+
+/**
+ 每当有一个新的视频帧写入时该方法会被调用
+ */
+- (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
+    
+}
+
+/**
+ 在上一个方法中，消耗了太多处理时间，迟到的帧会在这个方法丢弃
+ */
+- (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
+    
+}
 #pragma mark - private
 
 /**
