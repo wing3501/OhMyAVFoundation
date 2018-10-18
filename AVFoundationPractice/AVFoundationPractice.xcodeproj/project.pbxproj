@@ -19,6 +19,7 @@
 		6245A7322170935E0011AB4C /* OMCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6245A7312170935E0011AB4C /* OMCameraViewController.m */; };
 		6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6269AB6221743DC300780156 /* OMCircleProgressView.m */; };
 		62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */; };
+		62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2DF822177530E003C0D2D /* AVCaptureDevice+Ext.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,8 @@
 		6269AB6221743DC300780156 /* OMCircleProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMCircleProgressView.m; sourceTree = "<group>"; };
 		62795B022175C7BA004329E4 /* OMAssetsLibraryTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMAssetsLibraryTool.h; sourceTree = "<group>"; };
 		62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMAssetsLibraryTool.m; sourceTree = "<group>"; };
+		62F2DF812177530E003C0D2D /* AVCaptureDevice+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AVCaptureDevice+Ext.h"; sourceTree = "<group>"; };
+		62F2DF822177530E003C0D2D /* AVCaptureDevice+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "AVCaptureDevice+Ext.m"; sourceTree = "<group>"; };
 		63CC57AFF2DB4CE123B7B59D /* Pods-AVFoundationPractice.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVFoundationPractice.release.xcconfig"; path = "Pods/Target Support Files/Pods-AVFoundationPractice/Pods-AVFoundationPractice.release.xcconfig"; sourceTree = "<group>"; };
 		F48EF586A560AD70BD792ACF /* libPods-AVFoundationPractice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AVFoundationPractice.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -101,6 +104,8 @@
 			children = (
 				622DCCFD21747D750055F9C6 /* NSFileManager+Ext.h */,
 				622DCCFE21747D750055F9C6 /* NSFileManager+Ext.m */,
+				62F2DF812177530E003C0D2D /* AVCaptureDevice+Ext.h */,
+				62F2DF822177530E003C0D2D /* AVCaptureDevice+Ext.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -284,6 +289,7 @@
 				6217977E216F4F1600AC1756 /* main.m in Sources */,
 				6245A7322170935E0011AB4C /* OMCameraViewController.m in Sources */,
 				622DCCFF21747D750055F9C6 /* NSFileManager+Ext.m in Sources */,
+				62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */,
 				62179770216F4F1400AC1756 /* AppDelegate.m in Sources */,
 				6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */,
 			);

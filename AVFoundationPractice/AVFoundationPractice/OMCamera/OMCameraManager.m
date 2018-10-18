@@ -11,10 +11,13 @@
 #import <AVFoundation/AVFoundation.h>
 #import "OMAssetsLibraryTool.h"
 #import "NSFileManager+Ext.h"
+#import "AVCaptureDevice+Ext.h"
 //人脸识别开关
 #define FaceScanON NO
 //机器码识别开关
 #define CodeScanON NO
+//高帧率捕捉开关
+#define HighFrameRateON NO
 
 static const CGFloat OMZoomRate = 1.f;
 
@@ -131,11 +134,15 @@ static const NSString *OMRampingVideoZoomFactorContext;
     }
     
     //约束对焦范围,提交近距离识别机器码成功率
-    if (self.activeCamera.autoFocusRangeRestrictionSupported || CodeScanON) {
+    if (self.activeCamera.autoFocusRangeRestrictionSupported && CodeScanON) {
         if ([self.activeCamera lockForConfiguration:error]) {
             self.activeCamera.autoFocusRangeRestriction = AVCaptureAutoFocusRangeRestrictionNear;
             [self.activeCamera unlockForConfiguration];
         }
+    }
+    //高帧率捕捉
+    if (self.activeCamera.supportsHighFrameRateCapture && HighFrameRateON) {
+        [self.activeCamera enableMaxFrameRateCapture:error];
     }
     
     //缩放监听
