@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "OMCameraViewController.h"
 #import "NSFileManager+Ext.h"
+#import "OMVideoWriteViewController.h"
 @interface ViewController ()
 /// 列表
 @property (nonatomic,strong) NSArray *dataArray;
@@ -19,8 +20,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _dataArray = @[@{@"name":@"相机",@"method":@"cameraViewController"},
-                   @{@"name":@"路径",@"method":@"temppath"}
+    _dataArray = @[@{@"name":@"自定义相机",@"method":@"cameraViewController"},
+                   @{@"name":@"视频读写",@"method":@"videoWriteViewController"}
                    ];
 }
 
@@ -49,7 +50,9 @@
     [self presentViewController:vc animated:YES completion:nil];
 }
 
-- (void)temppath {
-    NSLog(@"==========>%@",[[NSFileManager defaultManager]temporaryDirectoryWithTemplateString:@"hahahaha"]);
+- (void)videoWriteViewController {
+    OMVideoWriteViewController *vc = [[OMVideoWriteViewController alloc]init];
+    vc.title = @"视频读写";
+    [self.navigationController pushViewController:vc animated:YES];
 }
 @end
