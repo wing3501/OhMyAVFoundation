@@ -19,7 +19,7 @@ NSString *const OMFilterSelectionChangedNotification = @"filter_selection_change
     self = [super initWithFrame:frame context:context];
     if (self) {
         self.enableSetNeedsDisplay = NO;
-        self.backgroundColor = [UIColor yellowColor];
+        self.backgroundColor = [UIColor blackColor];
         self.opaque = YES;
         
         // because the native video image from the back camera is in

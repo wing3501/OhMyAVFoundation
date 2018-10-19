@@ -49,7 +49,7 @@
  设置视图
  */
 - (void)setupUI {
-    self.view.backgroundColor = [UIColor yellowColor];
+    self.view.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.previewView];
     [self.view addSubview:self.progressView];
 }
@@ -100,6 +100,7 @@
         EAGLContext *eaglContext = [OMContextManager sharedOMContextManager].eaglContext;
         _previewView = [[OMPreviewView alloc] initWithFrame:self.view.bounds context:eaglContext];
         _previewView.filter = [OMPhotoFilters defaultFilter];
+        _previewView.coreImageContext = [OMContextManager sharedOMContextManager].ciContext;
     }
     return _previewView;
 }
