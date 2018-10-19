@@ -17,6 +17,7 @@
 		622DCCFF21747D750055F9C6 /* NSFileManager+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 622DCCFE21747D750055F9C6 /* NSFileManager+Ext.m */; };
 		6245A72F21707B4C0011AB4C /* OMCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6245A72E21707B4C0011AB4C /* OMCameraManager.m */; };
 		6245A7322170935E0011AB4C /* OMCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6245A7312170935E0011AB4C /* OMCameraViewController.m */; };
+		62476CD52179D13800712B90 /* OMMovieWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 62476CD42179D13800712B90 /* OMMovieWriter.m */; };
 		6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6269AB6221743DC300780156 /* OMCircleProgressView.m */; };
 		62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */; };
 		62C2079421797DBB00D6A478 /* OMFilterCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C2079321797DBB00D6A478 /* OMFilterCameraViewController.m */; };
@@ -48,6 +49,8 @@
 		6245A72E21707B4C0011AB4C /* OMCameraManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMCameraManager.m; sourceTree = "<group>"; };
 		6245A7302170935E0011AB4C /* OMCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMCameraViewController.h; sourceTree = "<group>"; };
 		6245A7312170935E0011AB4C /* OMCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMCameraViewController.m; sourceTree = "<group>"; };
+		62476CD32179D13800712B90 /* OMMovieWriter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMMovieWriter.h; sourceTree = "<group>"; };
+		62476CD42179D13800712B90 /* OMMovieWriter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMMovieWriter.m; sourceTree = "<group>"; };
 		6269AB6121743DC300780156 /* OMCircleProgressView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMCircleProgressView.h; sourceTree = "<group>"; };
 		6269AB6221743DC300780156 /* OMCircleProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMCircleProgressView.m; sourceTree = "<group>"; };
 		62795B022175C7BA004329E4 /* OMAssetsLibraryTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMAssetsLibraryTool.h; sourceTree = "<group>"; };
@@ -171,6 +174,8 @@
 				62C20799217987EF00D6A478 /* OMContextManager.m */,
 				62C2079B217989A000D6A478 /* OMPhotoFilters.h */,
 				62C2079C217989A000D6A478 /* OMPhotoFilters.m */,
+				62476CD32179D13800712B90 /* OMMovieWriter.h */,
+				62476CD42179D13800712B90 /* OMMovieWriter.m */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -328,6 +333,7 @@
 				6245A72F21707B4C0011AB4C /* OMCameraManager.m in Sources */,
 				62179773216F4F1400AC1756 /* ViewController.m in Sources */,
 				62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */,
+				62476CD52179D13800712B90 /* OMMovieWriter.m in Sources */,
 				62C7D3D8217868B600EAF19B /* OMVideoTool.m in Sources */,
 				6217977E216F4F1600AC1756 /* main.m in Sources */,
 				62C2079A217987EF00D6A478 /* OMContextManager.m in Sources */,

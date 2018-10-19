@@ -12,6 +12,7 @@
 #import "OMAssetsLibraryTool.h"
 #import "NSFileManager+Ext.h"
 #import "AVCaptureDevice+Ext.h"
+#import "OMMovieWriter.h"
 //人脸识别开关
 #define FaceScanON NO
 //机器码识别开关
@@ -28,11 +29,11 @@ static const NSString *OMRampingVideoZoomContext;
 static const NSString *OMRampingVideoZoomFactorContext;
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-@interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,AVCaptureAudioDataOutputSampleBufferDelegate>
+@interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,AVCaptureAudioDataOutputSampleBufferDelegate,OMMovieWriterDelegate>
 /// 静态图输出
 @property (nonatomic,strong) AVCapturePhotoOutput *imageOutput;
 #else
-@interface OMCameraManager()<AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,AVCaptureAudioDataOutputSampleBufferDelegate>
+@interface OMCameraManager()<AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,AVCaptureAudioDataOutputSampleBufferDelegate,OMMovieWriterDelegate>
 /// 静态图输出
 @property (nonatomic,strong) AVCaptureStillImageOutput *imageOutput;
 #endif
@@ -47,6 +48,8 @@ static const NSString *OMRampingVideoZoomFactorContext;
 @property (nonatomic,strong) AVCaptureVideoDataOutput *videoDataOutput;
 /// 音频数据输出
 @property (nonatomic,strong) AVCaptureAudioDataOutput *audioDataOutput;
+/// 视频写入
+@property (nonatomic,strong) OMMovieWriter *movieWriter;
 /// 元数据输出
 @property (nonatomic,strong) AVCaptureMetadataOutput *metadataOutput;
 /// 视频输出URL
@@ -126,6 +129,13 @@ static const NSString *OMRampingVideoZoomFactorContext;
             [self.captureSession addOutput:self.audioDataOutput];
         }
         
+        NSString *fileType = AVFileTypeQuickTimeMovie;
+        
+        NSDictionary *videoSettings = [self.videoDataOutput recommendedVideoSettingsForAssetWriterWithOutputFileType:fileType];
+        NSDictionary *audioSettings = [self.audioDataOutput recommendedAudioSettingsForAssetWriterWithOutputFileType:fileType];
+        
+        self.movieWriter = [[OMMovieWriter alloc] initWithVideoSettings:videoSettings audioSettings:audioSettings dispatchQueue:self.videoQueue];
+        self.movieWriter.delegate = self;
     }else {
         //设置视频文件输出
         self.movieOutput = [[AVCaptureMovieFileOutput alloc] init];
@@ -271,49 +281,59 @@ static const NSString *OMRampingVideoZoomFactorContext;
  开始录制视频
  */
 - (void)startRecording {
-    WEAKSELF
-    dispatch_async(self.videoQueue, ^{
-        STRONGSELF
-        if ([strongSelf isRecording]) {
-            return;
-        }
-        AVCaptureConnection *videoConnection = [strongSelf.movieOutput connectionWithMediaType:AVMediaTypeVideo];
-        if ([videoConnection isVideoOrientationSupported]) {
-            videoConnection.videoOrientation = strongSelf.currentVideoOrientation;
-        }
-        if ([videoConnection isVideoStabilizationSupported]) {//是否支持视频稳定功能，可以显著提高视频质量
-            if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.0) {
-                videoConnection.enablesVideoStabilizationWhenAvailable = YES;
-            } else {
-                videoConnection.preferredVideoStabilizationMode = AVCaptureVideoStabilizationModeAuto;
+    if (VideoDataOutputON) {
+        [self.movieWriter startWriting];
+        self.recording = YES;
+    }else{
+        WEAKSELF
+        dispatch_async(self.videoQueue, ^{
+            STRONGSELF
+            if ([strongSelf isRecording]) {
+                return;
             }
-        }
-        AVCaptureDevice *device = [strongSelf activeCamera];
-        if (device.isSmoothAutoFocusSupported) {//是否支持平滑对焦模式，可以提供更自然的录制效果
-            NSError *error;
-            if ([device lockForConfiguration:&error]) {
-                device.smoothAutoFocusEnabled = NO;
-                [device unlockForConfiguration];
-            } else {
-                if ([strongSelf.delegate respondsToSelector:@selector(deviceConfigurationFailedWithError:)]) {
-                    [strongSelf.delegate deviceConfigurationFailedWithError:error];
+            AVCaptureConnection *videoConnection = [strongSelf.movieOutput connectionWithMediaType:AVMediaTypeVideo];
+            if ([videoConnection isVideoOrientationSupported]) {
+                videoConnection.videoOrientation = strongSelf.currentVideoOrientation;
+            }
+            if ([videoConnection isVideoStabilizationSupported]) {//是否支持视频稳定功能，可以显著提高视频质量
+                if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.0) {
+                    videoConnection.enablesVideoStabilizationWhenAvailable = YES;
+                } else {
+                    videoConnection.preferredVideoStabilizationMode = AVCaptureVideoStabilizationModeAuto;
                 }
             }
-        }
-        strongSelf.outputURL = [strongSelf uniqueURL];
-        [strongSelf.movieOutput startRecordingToOutputFileURL:strongSelf.outputURL recordingDelegate:strongSelf];
-    });
+            AVCaptureDevice *device = [strongSelf activeCamera];
+            if (device.isSmoothAutoFocusSupported) {//是否支持平滑对焦模式，可以提供更自然的录制效果
+                NSError *error;
+                if ([device lockForConfiguration:&error]) {
+                    device.smoothAutoFocusEnabled = NO;
+                    [device unlockForConfiguration];
+                } else {
+                    if ([strongSelf.delegate respondsToSelector:@selector(deviceConfigurationFailedWithError:)]) {
+                        [strongSelf.delegate deviceConfigurationFailedWithError:error];
+                    }
+                }
+            }
+            strongSelf.outputURL = [strongSelf uniqueURL];
+            [strongSelf.movieOutput startRecordingToOutputFileURL:strongSelf.outputURL recordingDelegate:strongSelf];
+        });
+    }
 }
 
 /**
  停止录制视频
  */
 - (void)stopRecording {
-    dispatch_async(self.videoQueue, ^{
-        if ([self isRecording]) {
-            [self.movieOutput stopRecording];
-        }
-    });
+    if (VideoDataOutputON) {
+        [self.movieWriter stopWriting];
+        self.recording = NO;
+    }else{
+        dispatch_async(self.videoQueue, ^{
+            if ([self isRecording]) {
+                [self.movieOutput stopRecording];
+            }
+        });
+    }
 }
 
 /**
@@ -789,6 +809,9 @@ static const NSString *OMRampingVideoZoomFactorContext;
  每当有一个新的视频帧写入时该方法会被调用
  */
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
+    
+    [self.movieWriter processSampleBuffer:sampleBuffer];
+    
     if (output == self.videoDataOutput) {
         CVPixelBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
         CIImage *sourceImage = [CIImage imageWithCVPixelBuffer:imageBuffer options:nil];
@@ -804,6 +827,16 @@ static const NSString *OMRampingVideoZoomFactorContext;
 - (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
     
 }
+
+#pragma mark - OMMovieWriterDelegate
+
+/**
+ 视频写入结束
+ */
+- (void)didWriteMovieAtURL:(NSURL *)outputURL {
+    [self writeVideoToAssetsLibrary:outputURL];
+}
+
 #pragma mark - private
 
 /**

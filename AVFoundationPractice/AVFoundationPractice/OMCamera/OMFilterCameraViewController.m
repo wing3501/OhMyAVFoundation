@@ -83,7 +83,11 @@
 }
 
 - (void)progressViewBeganLongPress:(OMCircleProgressView *)progressView {
-    [self.cameraManager startRecording];//开始录制视频
+    if (!self.cameraManager.isRecording) {
+        dispatch_async(dispatch_queue_create("com.tapharmonic.kamera", NULL), ^{
+            [self.cameraManager startRecording];
+        });
+    }
 }
 
 - (void)progressViewStopCountDown:(OMCircleProgressView *)progressView {

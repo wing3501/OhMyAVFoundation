@@ -135,6 +135,8 @@ static NSTimeInterval const kTimelimit = 15.0;
     if (_timer) {
         [_timer invalidate];
         _timer = nil;
+    }else{
+        return;
     }
      _timeCount = 0;
     //动画结束

@@ -71,7 +71,8 @@ static const CGFloat kMaxZoomFactor = 4.0f;
 @property (nonatomic,strong) id<OMCameraManagerDelegate> delegate;
 /// 捕捉会话
 @property (nonatomic,strong,readonly) AVCaptureSession *captureSession;
-
+/// 是否正在录制
+@property (nonatomic,assign) BOOL recording;
 //*****************************会话控制*****************************
 /**
  初始化会话
