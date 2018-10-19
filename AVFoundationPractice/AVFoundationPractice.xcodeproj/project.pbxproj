@@ -19,6 +19,10 @@
 		6245A7322170935E0011AB4C /* OMCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6245A7312170935E0011AB4C /* OMCameraViewController.m */; };
 		6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6269AB6221743DC300780156 /* OMCircleProgressView.m */; };
 		62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */; };
+		62C2079421797DBB00D6A478 /* OMFilterCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C2079321797DBB00D6A478 /* OMFilterCameraViewController.m */; };
+		62C207972179851C00D6A478 /* OMPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C207962179851C00D6A478 /* OMPreviewView.m */; };
+		62C2079A217987EF00D6A478 /* OMContextManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C20799217987EF00D6A478 /* OMContextManager.m */; };
+		62C2079D217989A000D6A478 /* OMPhotoFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C2079C217989A000D6A478 /* OMPhotoFilters.m */; };
 		62C7D3D221785FF600EAF19B /* OMVideoWriteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C7D3D121785FF600EAF19B /* OMVideoWriteViewController.m */; };
 		62C7D3D52178616C00EAF19B /* 20180920094712.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 62C7D3D42178616C00EAF19B /* 20180920094712.mp4 */; };
 		62C7D3D8217868B600EAF19B /* OMVideoTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C7D3D7217868B600EAF19B /* OMVideoTool.m */; };
@@ -48,6 +52,14 @@
 		6269AB6221743DC300780156 /* OMCircleProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMCircleProgressView.m; sourceTree = "<group>"; };
 		62795B022175C7BA004329E4 /* OMAssetsLibraryTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMAssetsLibraryTool.h; sourceTree = "<group>"; };
 		62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMAssetsLibraryTool.m; sourceTree = "<group>"; };
+		62C2079221797DBB00D6A478 /* OMFilterCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMFilterCameraViewController.h; sourceTree = "<group>"; };
+		62C2079321797DBB00D6A478 /* OMFilterCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMFilterCameraViewController.m; sourceTree = "<group>"; };
+		62C207952179851C00D6A478 /* OMPreviewView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMPreviewView.h; sourceTree = "<group>"; };
+		62C207962179851C00D6A478 /* OMPreviewView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMPreviewView.m; sourceTree = "<group>"; };
+		62C20798217987EF00D6A478 /* OMContextManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMContextManager.h; sourceTree = "<group>"; };
+		62C20799217987EF00D6A478 /* OMContextManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMContextManager.m; sourceTree = "<group>"; };
+		62C2079B217989A000D6A478 /* OMPhotoFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMPhotoFilters.h; sourceTree = "<group>"; };
+		62C2079C217989A000D6A478 /* OMPhotoFilters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMPhotoFilters.m; sourceTree = "<group>"; };
 		62C7D3D021785FF600EAF19B /* OMVideoWriteViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMVideoWriteViewController.h; sourceTree = "<group>"; };
 		62C7D3D121785FF600EAF19B /* OMVideoWriteViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMVideoWriteViewController.m; sourceTree = "<group>"; };
 		62C7D3D42178616C00EAF19B /* 20180920094712.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = 20180920094712.mp4; sourceTree = "<group>"; };
@@ -129,6 +141,8 @@
 				6245A72E21707B4C0011AB4C /* OMCameraManager.m */,
 				6245A7302170935E0011AB4C /* OMCameraViewController.h */,
 				6245A7312170935E0011AB4C /* OMCameraViewController.m */,
+				62C2079221797DBB00D6A478 /* OMFilterCameraViewController.h */,
+				62C2079321797DBB00D6A478 /* OMFilterCameraViewController.m */,
 				62C7D3D021785FF600EAF19B /* OMVideoWriteViewController.h */,
 				62C7D3D121785FF600EAF19B /* OMVideoWriteViewController.m */,
 			);
@@ -140,6 +154,8 @@
 			children = (
 				6269AB6121743DC300780156 /* OMCircleProgressView.h */,
 				6269AB6221743DC300780156 /* OMCircleProgressView.m */,
+				62C207952179851C00D6A478 /* OMPreviewView.h */,
+				62C207962179851C00D6A478 /* OMPreviewView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -151,6 +167,10 @@
 				62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */,
 				62C7D3D6217868B600EAF19B /* OMVideoTool.h */,
 				62C7D3D7217868B600EAF19B /* OMVideoTool.m */,
+				62C20798217987EF00D6A478 /* OMContextManager.h */,
+				62C20799217987EF00D6A478 /* OMContextManager.m */,
+				62C2079B217989A000D6A478 /* OMPhotoFilters.h */,
+				62C2079C217989A000D6A478 /* OMPhotoFilters.m */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -310,12 +330,16 @@
 				62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */,
 				62C7D3D8217868B600EAF19B /* OMVideoTool.m in Sources */,
 				6217977E216F4F1600AC1756 /* main.m in Sources */,
+				62C2079A217987EF00D6A478 /* OMContextManager.m in Sources */,
 				6245A7322170935E0011AB4C /* OMCameraViewController.m in Sources */,
 				622DCCFF21747D750055F9C6 /* NSFileManager+Ext.m in Sources */,
 				62C7D3D221785FF600EAF19B /* OMVideoWriteViewController.m in Sources */,
 				62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */,
+				62C207972179851C00D6A478 /* OMPreviewView.m in Sources */,
+				62C2079D217989A000D6A478 /* OMPhotoFilters.m in Sources */,
 				62179770216F4F1400AC1756 /* AppDelegate.m in Sources */,
 				6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */,
+				62C2079421797DBB00D6A478 /* OMFilterCameraViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,6 +10,7 @@
 #import "OMCameraViewController.h"
 #import "NSFileManager+Ext.h"
 #import "OMVideoWriteViewController.h"
+#import "OMFilterCameraViewController.h"
 @interface ViewController ()
 /// 列表
 @property (nonatomic,strong) NSArray *dataArray;
@@ -21,7 +22,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _dataArray = @[@{@"name":@"自定义相机",@"method":@"cameraViewController"},
-                   @{@"name":@"视频读写",@"method":@"videoWriteViewController"}
+                   @{@"name":@"视频读写",@"method":@"videoWriteViewController"},
+                   @{@"name":@"滤镜相机(打开VideoDataOutputON)",@"method":@"filterCameraViewController"}
                    ];
 }
 
@@ -54,5 +56,10 @@
     OMVideoWriteViewController *vc = [[OMVideoWriteViewController alloc]init];
     vc.title = @"视频读写";
     [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)filterCameraViewController {
+    OMFilterCameraViewController *vc = [[OMFilterCameraViewController alloc]init];
+    [self presentViewController:vc animated:YES completion:nil];
 }
 @end

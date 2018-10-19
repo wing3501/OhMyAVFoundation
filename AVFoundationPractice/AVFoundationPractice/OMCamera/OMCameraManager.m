@@ -19,7 +19,7 @@
 //高帧率捕捉开关
 #define HighFrameRateON NO
 //视频帧处理输出开关
-#define VideoDataOutputON NO
+#define VideoDataOutputON YES
 
 static const CGFloat OMZoomRate = 1.f;
 
@@ -28,11 +28,11 @@ static const NSString *OMRampingVideoZoomContext;
 static const NSString *OMRampingVideoZoomFactorContext;
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-@interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface OMCameraManager()<AVCapturePhotoCaptureDelegate,AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,AVCaptureAudioDataOutputSampleBufferDelegate>
 /// 静态图输出
 @property (nonatomic,strong) AVCapturePhotoOutput *imageOutput;
 #else
-@interface OMCameraManager()<AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface OMCameraManager()<AVCaptureFileOutputRecordingDelegate,AVCaptureMetadataOutputObjectsDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,AVCaptureAudioDataOutputSampleBufferDelegate>
 /// 静态图输出
 @property (nonatomic,strong) AVCaptureStillImageOutput *imageOutput;
 #endif
@@ -45,6 +45,8 @@ static const NSString *OMRampingVideoZoomFactorContext;
 @property (nonatomic,strong) AVCaptureMovieFileOutput *movieOutput;
 /// 视频数据输出(帧处理)
 @property (nonatomic,strong) AVCaptureVideoDataOutput *videoDataOutput;
+/// 音频数据输出
+@property (nonatomic,strong) AVCaptureAudioDataOutput *audioDataOutput;
 /// 元数据输出
 @property (nonatomic,strong) AVCaptureMetadataOutput *metadataOutput;
 /// 视频输出URL
@@ -109,20 +111,27 @@ static const NSString *OMRampingVideoZoomFactorContext;
         [self.captureSession addOutput:self.imageOutput];
     }
     
-    //设置视频文件输出
-    self.movieOutput = [[AVCaptureMovieFileOutput alloc] init];
-//    self.movieOutput.movieFragmentInterval = CMTimeMake(10, 1);//每隔10秒写入片段
-    if ([self.captureSession canAddOutput:self.movieOutput]) {
-        [self.captureSession addOutput:self.movieOutput];
-    }
-    
     if (VideoDataOutputON) {
         self.videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
-        self.videoDataOutput.alwaysDiscardsLateVideoFrames = YES;
-        self.videoDataOutput.videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};
-        [self.videoDataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
+        self.videoDataOutput.alwaysDiscardsLateVideoFrames = NO;//捕捉全部的可用帧，会增加内存消耗
+        self.videoDataOutput.videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};//适合OpenGL ES 和CoreImage
+        [self.videoDataOutput setSampleBufferDelegate:self queue:self.videoQueue];
         if ([self.captureSession canAddOutput:self.videoDataOutput]) {
             [self.captureSession addOutput:self.videoDataOutput];
+        }
+        
+        self.audioDataOutput = [[AVCaptureAudioDataOutput alloc] init];
+        [self.audioDataOutput setSampleBufferDelegate:self queue:self.videoQueue];
+        if ([self.captureSession canAddOutput:self.audioDataOutput]) {
+            [self.captureSession addOutput:self.audioDataOutput];
+        }
+        
+    }else {
+        //设置视频文件输出
+        self.movieOutput = [[AVCaptureMovieFileOutput alloc] init];
+        //    self.movieOutput.movieFragmentInterval = CMTimeMake(10, 1);//每隔10秒写入片段
+        if ([self.captureSession canAddOutput:self.movieOutput]) {
+            [self.captureSession addOutput:self.movieOutput];
         }
     }
     
@@ -668,7 +677,7 @@ static const NSString *OMRampingVideoZoomFactorContext;
 - (void)updateZoomingDelegate {
     CGFloat curZoomFactor = self.activeCamera.videoZoomFactor;
     CGFloat maxZoomFactor = [self maxZoomFactor];
-    CGFloat value = log(curZoomFactor) / log(maxZoomFactor);
+//    CGFloat value = log(curZoomFactor) / log(maxZoomFactor);
     if ([self.delegate respondsToSelector:@selector(rampedZoomToValue:)]) {
 //        [self.delegate rampedZoomToValue:value];
         [self.delegate rampedZoomToValue:curZoomFactor];
@@ -780,7 +789,13 @@ static const NSString *OMRampingVideoZoomFactorContext;
  每当有一个新的视频帧写入时该方法会被调用
  */
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    
+    if (output == self.videoDataOutput) {
+        CVPixelBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+        CIImage *sourceImage = [CIImage imageWithCVPixelBuffer:imageBuffer options:nil];
+        if ([self.delegate respondsToSelector:@selector(captureVideoSample:)]) {
+            [self.delegate captureVideoSample:sourceImage];
+        }
+    }
 }
 
 /**

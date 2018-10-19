@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+typedef void(^AssetsLibraryCompletionHandler)(_Nullable id obj,NSError * _Nullable error);
+
 NS_ASSUME_NONNULL_BEGIN
-typedef void(^AssetsLibraryCompletionHandler)(id obj,NSError *error);
 
 @interface OMAssetsLibraryTool : NSObject
 /**
