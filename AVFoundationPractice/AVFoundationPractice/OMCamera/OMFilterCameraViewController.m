@@ -19,6 +19,10 @@
 @property (nonatomic,strong) OMPreviewView *previewView;
 /// 拍摄按钮
 @property (nonatomic,strong) OMCircleProgressView *progressView;
+/// 切换滤镜
+@property (nonatomic,strong) UIButton *filterButton;
+/// 滤镜下标
+@property (nonatomic,assign) NSInteger filterIndex;
 @end
 
 @implementation OMFilterCameraViewController
@@ -52,6 +56,24 @@
     self.view.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.previewView];
     [self.view addSubview:self.progressView];
+    [self.view addSubview:self.filterButton];
+    
+    
+}
+
+/**
+ 切换滤镜
+ */
+- (void)changeFilter {
+    NSArray *array = [OMPhotoFilters filterNames];
+    _filterIndex++;
+    if (_filterIndex == array.count) {
+        _filterIndex = 0;
+    }
+    NSString *name = array[_filterIndex];
+    [_filterButton setTitle:name forState:UIControlStateNormal];
+    CIFilter *filter = [OMPhotoFilters filterForDisplayName:name];
+    [[NSNotificationCenter defaultCenter]postNotificationName:OMFilterSelectionChangedNotification object:filter];
 }
 
 #pragma mark - OMCircleProgressViewDelegate
@@ -103,5 +125,16 @@
         _previewView.coreImageContext = [OMContextManager sharedOMContextManager].ciContext;
     }
     return _previewView;
+}
+
+- (UIButton *)filterButton {
+    if (!_filterButton) {
+        _filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _filterButton.frame = CGRectMake(60, 60, 250, 50);
+        [_filterButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [_filterButton addTarget:self action:@selector(changeFilter) forControlEvents:UIControlEventTouchUpInside];
+        [_filterButton setTitle:[OMPhotoFilters filterNames].firstObject forState:UIControlStateNormal];
+    }
+    return _filterButton;
 }
 @end
