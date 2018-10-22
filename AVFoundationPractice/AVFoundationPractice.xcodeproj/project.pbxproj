@@ -27,6 +27,8 @@
 		62C7D3D221785FF600EAF19B /* OMVideoWriteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C7D3D121785FF600EAF19B /* OMVideoWriteViewController.m */; };
 		62C7D3D52178616C00EAF19B /* 20180920094712.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 62C7D3D42178616C00EAF19B /* 20180920094712.mp4 */; };
 		62C7D3D8217868B600EAF19B /* OMVideoTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C7D3D7217868B600EAF19B /* OMVideoTool.m */; };
+		62EFCD86217DB6A800B5D5DB /* OMVideoListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62EFCD85217DB6A800B5D5DB /* OMVideoListViewController.m */; };
+		62EFCD8A217DBDE600B5D5DB /* OMVideoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 62EFCD89217DBDE600B5D5DB /* OMVideoModel.m */; };
 		62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2DF822177530E003C0D2D /* AVCaptureDevice+Ext.m */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +70,10 @@
 		62C7D3D42178616C00EAF19B /* 20180920094712.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = 20180920094712.mp4; sourceTree = "<group>"; };
 		62C7D3D6217868B600EAF19B /* OMVideoTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMVideoTool.h; sourceTree = "<group>"; };
 		62C7D3D7217868B600EAF19B /* OMVideoTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMVideoTool.m; sourceTree = "<group>"; };
+		62EFCD84217DB6A700B5D5DB /* OMVideoListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMVideoListViewController.h; sourceTree = "<group>"; };
+		62EFCD85217DB6A800B5D5DB /* OMVideoListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMVideoListViewController.m; sourceTree = "<group>"; };
+		62EFCD88217DBDE600B5D5DB /* OMVideoModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMVideoModel.h; sourceTree = "<group>"; };
+		62EFCD89217DBDE600B5D5DB /* OMVideoModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMVideoModel.m; sourceTree = "<group>"; };
 		62F2DF812177530E003C0D2D /* AVCaptureDevice+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AVCaptureDevice+Ext.h"; sourceTree = "<group>"; };
 		62F2DF822177530E003C0D2D /* AVCaptureDevice+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "AVCaptureDevice+Ext.m"; sourceTree = "<group>"; };
 		63CC57AFF2DB4CE123B7B59D /* Pods-AVFoundationPractice.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVFoundationPractice.release.xcconfig"; path = "Pods/Target Support Files/Pods-AVFoundationPractice/Pods-AVFoundationPractice.release.xcconfig"; sourceTree = "<group>"; };
@@ -137,6 +143,7 @@
 		6245A72C21707AC60011AB4C /* OMCamera */ = {
 			isa = PBXGroup;
 			children = (
+				62EFCD87217DBDB000B5D5DB /* Model */,
 				62795B012175C35C004329E4 /* Tool */,
 				622DCCFC21747D510055F9C6 /* Category */,
 				6269AB6021743D7800780156 /* View */,
@@ -148,6 +155,8 @@
 				62C2079321797DBB00D6A478 /* OMFilterCameraViewController.m */,
 				62C7D3D021785FF600EAF19B /* OMVideoWriteViewController.h */,
 				62C7D3D121785FF600EAF19B /* OMVideoWriteViewController.m */,
+				62EFCD84217DB6A700B5D5DB /* OMVideoListViewController.h */,
+				62EFCD85217DB6A800B5D5DB /* OMVideoListViewController.m */,
 			);
 			path = OMCamera;
 			sourceTree = "<group>";
@@ -186,6 +195,15 @@
 				62C7D3D42178616C00EAF19B /* 20180920094712.mp4 */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		62EFCD87217DBDB000B5D5DB /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				62EFCD88217DBDE600B5D5DB /* OMVideoModel.h */,
+				62EFCD89217DBDE600B5D5DB /* OMVideoModel.m */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		641062172DE6C87269ADAC21 /* Frameworks */ = {
@@ -331,7 +349,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				6245A72F21707B4C0011AB4C /* OMCameraManager.m in Sources */,
+				62EFCD8A217DBDE600B5D5DB /* OMVideoModel.m in Sources */,
 				62179773216F4F1400AC1756 /* ViewController.m in Sources */,
+				62EFCD86217DB6A800B5D5DB /* OMVideoListViewController.m in Sources */,
 				62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */,
 				62476CD52179D13800712B90 /* OMMovieWriter.m in Sources */,
 				62C7D3D8217868B600EAF19B /* OMVideoTool.m in Sources */,
