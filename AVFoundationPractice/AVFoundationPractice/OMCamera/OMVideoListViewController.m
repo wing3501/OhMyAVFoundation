@@ -8,11 +8,14 @@
 
 #import "OMVideoListViewController.h"
 #import "OMVideoModel.h"
+
 @interface OMVideoListViewController ()<UITableViewDelegate,UITableViewDataSource>
 /// 列表
 @property (nonatomic,strong) UITableView *tableView;
 /// 数据
 @property (nonatomic,strong) NSMutableArray *dataArray;
+/// 选中的视频列表
+@property (nonatomic,strong) NSMutableArray *selectedArray;
 @end
 
 @implementation OMVideoListViewController
@@ -37,6 +40,9 @@
  */
 - (void)setupUI {
     [self.view addSubview:self.tableView];
+    UIBarButtonItem *cuttingItem = [[UIBarButtonItem alloc]initWithTitle:@"裁剪" style:UIBarButtonItemStylePlain target:self action:@selector(cutting)];
+    UIBarButtonItem *playItem = [[UIBarButtonItem alloc]initWithTitle:@"播放" style:UIBarButtonItemStylePlain target:self action:@selector(play)];
+    self.navigationItem.rightBarButtonItems = @[playItem,cuttingItem];
 }
 
 /**
@@ -80,14 +86,99 @@
     }
 }
 
+/**
+ 加载资源
+ */
+- (void)loadAsset:(NSURL *)URL withCompletionBlock:(VoidBlock_id)completionBlock{
+    NSDictionary *options = @{AVURLAssetPreferPreciseDurationAndTimingKey:@YES};//可以计算出时长和时间信息
+    AVAsset *asset = [AVURLAsset URLAssetWithURL:URL options:options];
+    NSArray *keys = @[@"tracks",@"duration",@"commonMetadata"];
+    [asset loadValuesAsynchronouslyForKeys:keys completionHandler:^{
+        NSError *error = nil;
+        AVKeyValueStatus status = [asset statusOfValueForKey:@"tracks" error:&error];
+        switch (status) {
+            case AVKeyValueStatusLoaded:
+                completionBlock?completionBlock(asset):nil;
+                break;
+            case AVKeyValueStatusFailed:
+                break;
+            case AVKeyValueStatusCancelled:
+                break;
+            default:
+                break;
+        }
+    }];
+}
+
+/**
+ 裁剪(裁剪中间的一半)
+ */
+- (void)cutting {
+    if (self.selectedArray.count == 0 || self.selectedArray.count > 1) {
+        [self showError:@"每次只能裁剪一个视频"];
+        return;
+    }
+    
+    OMVideoModel *model = self.selectedArray.firstObject;
+    WEAKSELF
+    [self loadAsset:[NSURL URLWithString:model.filePath] withCompletionBlock:^(AVAsset *asset) {
+        STRONGSELF
+        AVMutableComposition *composition = [AVMutableComposition composition];
+        AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+        AVMutableCompositionTrack *audioTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+        
+        int64_t value = [NSString stringWithFormat:@"%.0f",asset.duration.value * 0.25].intValue;
+        CMTime start = CMTimeMake(value, asset.duration.timescale);
+        CMTime duration = CMTimeMake(value * 2, asset.duration.timescale);
+        CMTimeRange range = CMTimeRangeMake(start, duration);
+    }];
+}
+
+/**
+ 播放
+ */
+- (void)play {
+    if (self.selectedArray.count == 0 || self.selectedArray.count > 1) {
+        return;
+    }
+    OMVideoModel *model = self.selectedArray.firstObject;
+    NSURL *url = [NSURL fileURLWithPath:model.filePath];
+    
+    AVPlayerViewController *controller = [[AVPlayerViewController alloc]init];
+    controller.player = [AVPlayer playerWithURL:url];
+    [self.navigationController pushViewController:controller animated:YES];
+}
+/**
+ 显示错误信息
+ */
+- (void)showError:(NSString *)errorMsg {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:errorMsg preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:action];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (NSURL *)outputURL {
+    NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%.0f.mov",[[NSDate date]timeIntervalSince1970]]];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:url.path]) {
+        [[NSFileManager defaultManager] removeItemAtURL:url error:nil];
+    }
+    return url;
+}
+
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
+    OMVideoModel *model = self.dataArray[indexPath.row];
+    model.selected = YES;
+    [self.selectedArray addObject:model];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-
+    OMVideoModel *model = self.dataArray[indexPath.row];
+    model.selected = NO;
+    [self.selectedArray removeObject:model];
 }
 #pragma mark - UITableViewDataSource
 
@@ -97,7 +188,9 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
-    cell.textLabel.text = self.dataArray[indexPath.section];
+    OMVideoModel *model = self.dataArray[indexPath.row];
+    cell.textLabel.text = model.fileName;
+    cell.selected = model.selected;
     return cell;
 }
 
@@ -121,5 +214,12 @@
         _dataArray = @[].mutableCopy;
     }
     return _dataArray;
+}
+
+- (NSMutableArray *)selectedArray {
+    if (!_selectedArray) {
+        _selectedArray = @[].mutableCopy;
+    }
+    return _selectedArray;
 }
 @end

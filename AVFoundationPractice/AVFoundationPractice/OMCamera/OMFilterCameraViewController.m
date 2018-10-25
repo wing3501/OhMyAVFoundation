@@ -23,6 +23,8 @@
 @property (nonatomic,strong) UIButton *filterButton;
 /// 滤镜下标
 @property (nonatomic,assign) NSInteger filterIndex;
+/// 关闭按钮
+@property (nonatomic,strong) UIButton *closeButton;
 @end
 
 @implementation OMFilterCameraViewController
@@ -57,7 +59,7 @@
     [self.view addSubview:self.previewView];
     [self.view addSubview:self.progressView];
     [self.view addSubview:self.filterButton];
-    
+    [self.view addSubview:self.closeButton];
     
 }
 
@@ -76,6 +78,12 @@
     [[NSNotificationCenter defaultCenter]postNotificationName:OMFilterSelectionChangedNotification object:filter];
 }
 
+/**
+ 关闭页面
+ */
+- (void)close {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 #pragma mark - OMCircleProgressViewDelegate
 
 - (void)progressViewDidSingleTap:(OMCircleProgressView *)progressView {
@@ -140,5 +148,16 @@
         [_filterButton setTitle:[OMPhotoFilters filterNames].firstObject forState:UIControlStateNormal];
     }
     return _filterButton;
+}
+
+- (UIButton *)closeButton {
+    if (!_closeButton) {
+        _closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_closeButton setImage:[UIImage imageNamed:@"close_arrow"] forState:UIControlStateNormal];
+        [_closeButton addTarget:self action:@selector(close) forControlEvents:UIControlEventTouchUpInside];
+        _closeButton.frame = CGRectMake(70, 0, 30, 30);
+        _closeButton.centerY = self.progressView.centerY;
+    }
+    return _closeButton;
 }
 @end

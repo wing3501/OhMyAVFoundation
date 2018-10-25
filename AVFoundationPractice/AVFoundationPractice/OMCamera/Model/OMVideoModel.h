@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,copy) NSString *fileName;
 /// 视频文件地址
 @property (nonatomic,copy) NSString *filePath;
+/// 是否选中
+@property (nonatomic, getter=isSelected) BOOL         selected;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -18,6 +18,7 @@
 		6245A72F21707B4C0011AB4C /* OMCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6245A72E21707B4C0011AB4C /* OMCameraManager.m */; };
 		6245A7322170935E0011AB4C /* OMCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6245A7312170935E0011AB4C /* OMCameraViewController.m */; };
 		62476CD52179D13800712B90 /* OMMovieWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 62476CD42179D13800712B90 /* OMMovieWriter.m */; };
+		624C01B4218199640085646B /* 209.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 624C01B3218199640085646B /* 209.mp3 */; };
 		6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6269AB6221743DC300780156 /* OMCircleProgressView.m */; };
 		62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */; };
 		62C2079421797DBB00D6A478 /* OMFilterCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C2079321797DBB00D6A478 /* OMFilterCameraViewController.m */; };
@@ -53,6 +54,7 @@
 		6245A7312170935E0011AB4C /* OMCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMCameraViewController.m; sourceTree = "<group>"; };
 		62476CD32179D13800712B90 /* OMMovieWriter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMMovieWriter.h; sourceTree = "<group>"; };
 		62476CD42179D13800712B90 /* OMMovieWriter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMMovieWriter.m; sourceTree = "<group>"; };
+		624C01B3218199640085646B /* 209.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 209.mp3; sourceTree = "<group>"; };
 		6269AB6121743DC300780156 /* OMCircleProgressView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMCircleProgressView.h; sourceTree = "<group>"; };
 		6269AB6221743DC300780156 /* OMCircleProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMCircleProgressView.m; sourceTree = "<group>"; };
 		62795B022175C7BA004329E4 /* OMAssetsLibraryTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMAssetsLibraryTool.h; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 		62C7D3D32178610200EAF19B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				624C01B3218199640085646B /* 209.mp3 */,
 				62C7D3D42178616C00EAF19B /* 20180920094712.mp4 */,
 			);
 			path = Resources;
@@ -284,6 +287,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6217977B216F4F1600AC1756 /* LaunchScreen.storyboard in Resources */,
+				624C01B4218199640085646B /* 209.mp3 in Resources */,
 				62179778216F4F1600AC1756 /* Assets.xcassets in Resources */,
 				62C7D3D52178616C00EAF19B /* 20180920094712.mp4 in Resources */,
 				62179776216F4F1400AC1756 /* Main.storyboard in Resources */,
