@@ -135,14 +135,14 @@
         CMTime duration = CMTimeMake(value * 2, asset.duration.timescale);
         CMTimeRange range = CMTimeRangeMake(start, duration);
         
-        AVAssetTrack *assetTrack;
-        assetTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
-        [videoTrack insertTimeRange:range ofTrack:assetTrack atTime:kCMTimeZero error:nil];
+        AVAssetTrack *assetVideoTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
+        [videoTrack insertTimeRange:range ofTrack:assetVideoTrack atTime:kCMTimeZero error:nil];
+        videoTrack.preferredTransform = assetVideoTrack.preferredTransform;
         
-        assetTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
-        [audioTrack insertTimeRange:range ofTrack:assetTrack atTime:kCMTimeZero error:nil];
+        AVAssetTrack *assetAudioTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
+        [audioTrack insertTimeRange:range ofTrack:assetAudioTrack atTime:kCMTimeZero error:nil];
         
-        
+        //导出操作
         NSURL *outputURL = [strongSelf outputURL];
         NSString *preset = AVAssetExportPreset1280x720;
         strongSelf.exportSession = [[AVAssetExportSession alloc]initWithAsset:composition presetName:preset];
@@ -194,6 +194,8 @@
     }
     OMVideoModel *model = self.selectedArray.firstObject;
     NSURL *url = [NSURL fileURLWithPath:model.filePath];
+
+//    NSLog(@"视频方向==>%lu",(unsigned long)[self degressFromVideoFileWithURL:url]);
     
     AVPlayerViewController *controller = [[AVPlayerViewController alloc]init];
     controller.player = [AVPlayer playerWithURL:url];
@@ -216,6 +218,37 @@
         [[NSFileManager defaultManager] removeItemAtURL:url error:nil];
     }
     return url;
+}
+
+/**
+ 视频方向
+ */
+- (NSUInteger)degressFromVideoFileWithURL:(NSURL *)url
+{
+    NSUInteger degress = 0;
+    
+    AVAsset *asset = [AVAsset assetWithURL:url];
+    NSArray *tracks = [asset tracksWithMediaType:AVMediaTypeVideo];
+    if([tracks count] > 0) {
+        AVAssetTrack *videoTrack = [tracks objectAtIndex:0];
+        CGAffineTransform t = videoTrack.preferredTransform;
+        
+        if(t.a == 0 && t.b == 1.0 && t.c == -1.0 && t.d == 0){
+            // Portrait
+            degress = 90;
+        }else if(t.a == 0 && t.b == -1.0 && t.c == 1.0 && t.d == 0){
+            // PortraitUpsideDown
+            degress = 270;
+        }else if(t.a == 1.0 && t.b == 0 && t.c == 0 && t.d == 1.0){
+            // LandscapeRight
+            degress = 0;
+        }else if(t.a == -1.0 && t.b == 0 && t.c == 0 && t.d == -1.0){
+            // LandscapeLeft
+            degress = 180;
+        }
+    }
+    
+    return degress;
 }
 
 #pragma mark - UITableViewDelegate
