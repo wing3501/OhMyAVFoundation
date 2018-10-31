@@ -8,6 +8,7 @@
 
 #import "OMVideoListViewController.h"
 #import "OMVideoModel.h"
+#import "OMAssetsLibraryTool.h"
 
 @interface OMVideoListViewController ()<UITableViewDelegate,UITableViewDataSource>
 /// 列表
@@ -16,6 +17,8 @@
 @property (nonatomic,strong) NSMutableArray *dataArray;
 /// 选中的视频列表
 @property (nonatomic,strong) NSMutableArray *selectedArray;
+/// 导出会话
+@property (nonatomic,strong) AVAssetExportSession *exportSession;
 @end
 
 @implementation OMVideoListViewController
@@ -121,7 +124,7 @@
     
     OMVideoModel *model = self.selectedArray.firstObject;
     WEAKSELF
-    [self loadAsset:[NSURL URLWithString:model.filePath] withCompletionBlock:^(AVAsset *asset) {
+    [self loadAsset:[NSURL fileURLWithPath:model.filePath] withCompletionBlock:^(AVAsset *asset) {
         STRONGSELF
         AVMutableComposition *composition = [AVMutableComposition composition];
         AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
@@ -131,8 +134,56 @@
         CMTime start = CMTimeMake(value, asset.duration.timescale);
         CMTime duration = CMTimeMake(value * 2, asset.duration.timescale);
         CMTimeRange range = CMTimeRangeMake(start, duration);
+        
+        AVAssetTrack *assetTrack;
+        assetTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
+        [videoTrack insertTimeRange:range ofTrack:assetTrack atTime:kCMTimeZero error:nil];
+        
+        assetTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
+        [audioTrack insertTimeRange:range ofTrack:assetTrack atTime:kCMTimeZero error:nil];
+        
+        
+        NSURL *outputURL = [strongSelf outputURL];
+        NSString *preset = AVAssetExportPreset1280x720;
+        strongSelf.exportSession = [[AVAssetExportSession alloc]initWithAsset:composition presetName:preset];
+        strongSelf.exportSession.outputFileType = AVFileTypeQuickTimeMovie;
+        strongSelf.exportSession.outputURL = outputURL;
+        strongSelf.exportSession.timeRange = CMTimeRangeMake(kCMTimeZero, duration);
+        [strongSelf.exportSession exportAsynchronouslyWithCompletionHandler:^{
+            STRONGSELF
+            AVAssetExportSessionStatus status = strongSelf.exportSession.status;
+            if (status == AVAssetExportSessionStatusFailed) {
+                NSLog(@"error:%@",strongSelf.exportSession.error);
+            }
+            NSLog(@"导出结束...");
+            if (status == AVAssetExportSessionStatusCompleted) {
+                [strongSelf writeVideoToAssetsLibrary:outputURL];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    STRONGSELF
+                    [strongSelf.selectedArray removeAllObjects];
+                    [strongSelf setupData];
+                    [strongSelf.tableView reloadData];
+                });
+            }
+        }];
     }];
 }
+
+/**
+ 写入视频到相册
+ 
+ @param videoURL 视频url
+ */
+- (void)writeVideoToAssetsLibrary:(NSURL *)videoURL {
+    [OMAssetsLibraryTool writeVideoToAssetsLibrary:videoURL withCompletionHandler:^(id  _Nonnull obj, NSError * _Nonnull error) {
+        if (error) {
+            NSLog(@"写入视频到相册失败");
+        } else {
+            NSLog(@"写入视频到相册成功");
+        }
+    }];
+}
+
 
 /**
  播放
@@ -171,13 +222,11 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     OMVideoModel *model = self.dataArray[indexPath.row];
-    model.selected = YES;
     [self.selectedArray addObject:model];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
     OMVideoModel *model = self.dataArray[indexPath.row];
-    model.selected = NO;
     [self.selectedArray removeObject:model];
 }
 #pragma mark - UITableViewDataSource
@@ -190,7 +239,6 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     OMVideoModel *model = self.dataArray[indexPath.row];
     cell.textLabel.text = model.fileName;
-    cell.selected = model.selected;
     return cell;
 }
 
@@ -204,6 +252,7 @@
         _tableView.rowHeight = 50;
         _tableView.sectionHeaderHeight = 0.01;
         _tableView.sectionFooterHeight = 0.01;
+        _tableView.allowsMultipleSelection = YES;
         [_tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"cell"];
     }
     return _tableView;
