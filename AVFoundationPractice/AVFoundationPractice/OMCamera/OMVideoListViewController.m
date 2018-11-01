@@ -44,8 +44,9 @@
 - (void)setupUI {
     [self.view addSubview:self.tableView];
     UIBarButtonItem *cuttingItem = [[UIBarButtonItem alloc]initWithTitle:@"裁剪" style:UIBarButtonItemStylePlain target:self action:@selector(cutting)];
+    UIBarButtonItem *composeItem = [[UIBarButtonItem alloc]initWithTitle:@"组合" style:UIBarButtonItemStylePlain target:self action:@selector(compose)];
     UIBarButtonItem *playItem = [[UIBarButtonItem alloc]initWithTitle:@"播放" style:UIBarButtonItemStylePlain target:self action:@selector(play)];
-    self.navigationItem.rightBarButtonItems = @[playItem,cuttingItem];
+    self.navigationItem.rightBarButtonItems = @[playItem,cuttingItem,composeItem];
 }
 
 /**
@@ -111,51 +112,72 @@
             [strongSelf.tableView reloadData];
         });
     }];
-    
-//    [OMVideoTool loadAsset:[NSURL fileURLWithPath:model.filePath] withCompletionHandler:^(AVAsset * _Nullable asset, NSError * _Nullable error) {
-//        STRONGSELF
-//        AVMutableComposition *composition = [AVMutableComposition composition];
-//        AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-//        AVMutableCompositionTrack *audioTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-//
-//        int64_t value = [NSString stringWithFormat:@"%.0f",asset.duration.value * 0.25].intValue;
-//        CMTime start = CMTimeMake(value, asset.duration.timescale);
-//        CMTime duration = CMTimeMake(value * 2, asset.duration.timescale);
-//        CMTimeRange range = CMTimeRangeMake(start, duration);
-//
-//        AVAssetTrack *assetVideoTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
-//        [videoTrack insertTimeRange:range ofTrack:assetVideoTrack atTime:kCMTimeZero error:nil];
-//        videoTrack.preferredTransform = assetVideoTrack.preferredTransform;
-//
-//        AVAssetTrack *assetAudioTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
-//        [audioTrack insertTimeRange:range ofTrack:assetAudioTrack atTime:kCMTimeZero error:nil];
-//
-//        //导出操作
-//        NSURL *outputURL = [strongSelf outputURL];
-//        NSString *preset = AVAssetExportPreset1280x720;
-//        strongSelf.exportSession = [[AVAssetExportSession alloc]initWithAsset:composition presetName:preset];
-//        strongSelf.exportSession.outputFileType = AVFileTypeQuickTimeMovie;
-//        strongSelf.exportSession.outputURL = outputURL;
-//        strongSelf.exportSession.timeRange = CMTimeRangeMake(kCMTimeZero, duration);
-//        [strongSelf.exportSession exportAsynchronouslyWithCompletionHandler:^{
-//            STRONGSELF
-//            AVAssetExportSessionStatus status = strongSelf.exportSession.status;
-//            if (status == AVAssetExportSessionStatusFailed) {
-//                NSLog(@"error:%@",strongSelf.exportSession.error);
-//            }
-//            NSLog(@"导出结束...");
-//            if (status == AVAssetExportSessionStatusCompleted) {
-//                [strongSelf writeVideoToAssetsLibrary:outputURL];
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    STRONGSELF
-//                    [strongSelf.selectedArray removeAllObjects];
-//                    [strongSelf setupData];
-//                    [strongSelf.tableView reloadData];
-//                });
-//            }
-//        }];
-//    }];
 }
+
+/**
+ 组合视频
+ */
+- (void)compose {
+    if (self.selectedArray.count < 2) {
+        [self showError:@"至少选择两个视频才能组合"];
+        return;
+    }
+    
+    NSArray *audioURLArray = @[[[NSBundle mainBundle]URLForResource:@"202" withExtension:@"mp3"],[[NSBundle mainBundle]URLForResource:@"209" withExtension:@"mp3"]];
+    NSMutableArray *videoTrackArray = @[].mutableCopy;
+    NSMutableArray *audioTrackArray = @[].mutableCopy;
+    WEAKSELF
+    for (OMVideoModel *model in self.selectedArray) {
+        [OMVideoTool loadAsset:[NSURL fileURLWithPath:model.filePath] withCompletionHandler:^(AVAsset * _Nullable asset, NSError * _Nullable error) {
+            STRONGSELF
+            if (asset) {
+                [videoTrackArray addObject:[OMAssetsTrackModel assetsTrackModelWithAsset:asset timeRange:CMTimeRangeMake(kCMTimeZero, CMTimeMake(5, 1))]];
+                if (videoTrackArray.count + audioTrackArray.count == (audioURLArray.count + strongSelf.selectedArray.count)) {
+                    NSLog(@"资源全加载完成了");
+                    [strongSelf composeVideoTrackArray:videoTrackArray audioTrackArray:audioTrackArray];
+                }
+            }
+        }];
+    }
+    for (NSURL *audioURL in audioURLArray) {
+        [OMVideoTool loadAsset:audioURL withCompletionHandler:^(AVAsset * _Nullable asset, NSError * _Nullable error) {
+            STRONGSELF
+            if (asset) {
+                [audioTrackArray addObject:[OMAssetsTrackModel assetsTrackModelWithAsset:asset timeRange:CMTimeRangeMake(CMTimeMake(20, 1), CMTimeMake(6, 1))]];
+                if (videoTrackArray.count + audioTrackArray.count == (audioURLArray.count + strongSelf.selectedArray.count)) {
+                    NSLog(@"资源全加载完成了");
+                    [strongSelf composeVideoTrackArray:videoTrackArray audioTrackArray:audioTrackArray];
+                }
+            }
+        }];
+    }
+}
+
+/**
+ 组合视频、音频
+
+ @param videoTrackArray 视频数组
+ @param audioTrackArray 音频数组
+ */
+- (void)composeVideoTrackArray:(NSMutableArray *)videoTrackArray audioTrackArray:(NSMutableArray *)audioTrackArray {
+    AVMutableComposition *composition = [OMVideoTool composeVideoWithVideoTrackModelArray:videoTrackArray andAudioTrackModelArray:audioTrackArray];
+    NSURL *outputURL = [self outputURL];
+    WEAKSELF
+    [[OMVideoTool sharedOMVideoTool]exportVideo:composition to:outputURL withPreset:nil outputFileType:nil completionHandler:^(NSError * _Nullable error) {
+        STRONGSELF
+        NSLog(@"导出结束========================>%@",error);
+        if (!error) {
+            [strongSelf writeVideoToAssetsLibrary:outputURL];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                STRONGSELF
+                [strongSelf.selectedArray removeAllObjects];
+                [strongSelf setupData];
+                [strongSelf.tableView reloadData];
+            });
+        }
+    }];
+}
+
 
 /**
  写入视频到相册

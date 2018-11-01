@@ -14,6 +14,7 @@
 		62179778216F4F1600AC1756 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62179777216F4F1600AC1756 /* Assets.xcassets */; };
 		6217977B216F4F1600AC1756 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 62179779216F4F1600AC1756 /* LaunchScreen.storyboard */; };
 		6217977E216F4F1600AC1756 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6217977D216F4F1600AC1756 /* main.m */; };
+		6222519D218AD8DA0093ABA3 /* 202.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6222519C218AD8DA0093ABA3 /* 202.mp3 */; };
 		622DCCFF21747D750055F9C6 /* NSFileManager+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 622DCCFE21747D750055F9C6 /* NSFileManager+Ext.m */; };
 		6245A72F21707B4C0011AB4C /* OMCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6245A72E21707B4C0011AB4C /* OMCameraManager.m */; };
 		6245A7322170935E0011AB4C /* OMCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6245A7312170935E0011AB4C /* OMCameraViewController.m */; };
@@ -45,6 +46,7 @@
 		6217977A216F4F1600AC1756 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6217977C216F4F1600AC1756 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6217977D216F4F1600AC1756 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6222519C218AD8DA0093ABA3 /* 202.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 202.mp3; sourceTree = "<group>"; };
 		622DCCFD21747D750055F9C6 /* NSFileManager+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Ext.h"; sourceTree = "<group>"; };
 		622DCCFE21747D750055F9C6 /* NSFileManager+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Ext.m"; sourceTree = "<group>"; };
 		6245A72B21704DB70011AB4C /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				624C01B3218199640085646B /* 209.mp3 */,
+				6222519C218AD8DA0093ABA3 /* 202.mp3 */,
 				62C7D3D42178616C00EAF19B /* 20180920094712.mp4 */,
 			);
 			path = Resources;
@@ -290,6 +293,7 @@
 				624C01B4218199640085646B /* 209.mp3 in Resources */,
 				62179778216F4F1600AC1756 /* Assets.xcassets in Resources */,
 				62C7D3D52178616C00EAF19B /* 20180920094712.mp4 in Resources */,
+				6222519D218AD8DA0093ABA3 /* 202.mp3 in Resources */,
 				62179776216F4F1400AC1756 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

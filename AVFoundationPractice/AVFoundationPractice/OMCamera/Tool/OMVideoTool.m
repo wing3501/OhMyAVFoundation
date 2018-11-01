@@ -7,6 +7,24 @@
 //
 
 #import "OMVideoTool.h"
+
+@implementation OMAssetsTrackModel
+
+- (instancetype)initWithAsset:(AVAsset *)asset timeRange:(CMTimeRange)timeRange {
+    self = [super init];
+    if (self) {
+        self.asset = asset;
+        self.timeRange = timeRange;
+    }
+    return  self;
+}
+
++ (instancetype)assetsTrackModelWithAsset:(AVAsset *)asset timeRange:(CMTimeRange)timeRange {
+    OMAssetsTrackModel *model = [[OMAssetsTrackModel alloc] initWithAsset:asset timeRange:timeRange];
+    return model;
+}
+@end
+
 @interface OMVideoTool()
 /// 样本读取
 @property (nonatomic,strong) AVAssetReader *assetReader;
@@ -123,6 +141,58 @@ SingletonM(OMVideoTool)
 }
 
 /**
+ 按顺序组合视频、音频
+ 
+ @param videoTrackModelArray 视频轨道数组
+ @param audioTrackModelArray 音频轨道数组
+ @return 组合后的视频
+ */
++ (AVMutableComposition *)composeVideoWithVideoTrackModelArray:(NSArray<OMAssetsTrackModel *> *)videoTrackModelArray andAudioTrackModelArray:(NSArray<OMAssetsTrackModel *> *)audioTrackModelArray {
+    AVMutableComposition *composition = [AVMutableComposition composition];
+    AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    AVMutableCompositionTrack *audioTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    CMTime cursorTime = kCMTimeZero;//游标
+    NSError *error;
+    //按顺序组合视频
+    for (NSUInteger i = 0; i < videoTrackModelArray.count; i++) {
+        OMAssetsTrackModel *assetsTrackModel = videoTrackModelArray[i];
+        AVAssetTrack *assetTrack = [assetsTrackModel.asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
+        if (i == 0) {
+            videoTrack.preferredTransform = assetTrack.preferredTransform;
+        }
+        [videoTrack insertTimeRange:assetsTrackModel.timeRange ofTrack:assetTrack atTime:cursorTime error:&error];
+        if (error) {
+            return nil;
+        }else{
+            cursorTime = CMTimeAdd(cursorTime, assetsTrackModel.timeRange.duration);
+        }
+    }
+    CMTime totalVideoDuration = cursorTime;//视频总长
+    cursorTime = kCMTimeZero;
+    //按顺序组合音频
+    for (NSUInteger i = 0; i < videoTrackModelArray.count; i++) {
+        OMAssetsTrackModel *assetsTrackModel = videoTrackModelArray[i];
+        AVAssetTrack *assetTrack = [assetsTrackModel.asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
+        CMTime audioDuration = assetsTrackModel.timeRange.duration;
+        if (CMTIME_COMPARE_INLINE(CMTimeAdd(cursorTime, audioDuration), >, totalVideoDuration)) {
+            //添加该音频后，总的音频长度会比总的视频长
+            audioDuration = CMTimeSubtract(totalVideoDuration, cursorTime);
+        }
+        [audioTrack insertTimeRange:CMTimeRangeMake(assetsTrackModel.timeRange.start, audioDuration) ofTrack:assetTrack atTime:cursorTime error:&error];
+        if (error) {
+            return nil;
+        }else{
+            cursorTime = CMTimeAdd(cursorTime, assetsTrackModel.timeRange.duration);
+            if (CMTIME_COMPARE_INLINE(cursorTime, >= , totalVideoDuration)) {
+                break;
+            }
+        }
+    }
+
+    return composition;
+}
+
+/**
  裁剪视频
  
  @param URL 本地视频URL
@@ -139,28 +209,7 @@ SingletonM(OMVideoTool)
         if (error) {
             completionHandler?completionHandler(error):nil;
         }else{
-            CMTimeRange assetTimeRange = CMTimeRangeMake(kCMTimeZero, asset.duration);
-            CMTimeRange intersectionRange = CMTimeRangeGetIntersection(assetTimeRange, timeRange);
-            if (CMTIMERANGE_IS_VALID(intersectionRange) && CMTimeGetSeconds(intersectionRange.duration) > 0) {
-                NSString *videoPreset = preset.length ? preset : AVAssetExportPreset1280x720;
-                AVFileType videoFileType = outputFileType.length ? outputFileType : AVFileTypeQuickTimeMovie;
-                strongSelf.exportSession = [[AVAssetExportSession alloc]initWithAsset:asset presetName:videoPreset];
-                strongSelf.exportSession.outputFileType = videoFileType;
-                strongSelf.exportSession.outputURL = outputURL;
-                strongSelf.exportSession.timeRange = intersectionRange;
-                [strongSelf.exportSession exportAsynchronouslyWithCompletionHandler:^{
-                    STRONGSELF
-                    AVAssetExportSessionStatus status = strongSelf.exportSession.status;
-                    if (status == AVAssetExportSessionStatusFailed) {
-                        NSLog(@"error:%@",strongSelf.exportSession.error);
-                        completionHandler ? completionHandler(strongSelf.exportSession.error):nil;
-                    }else if (status == AVAssetExportSessionStatusCompleted) {
-                        completionHandler ? completionHandler(nil):nil;
-                    }
-                }];
-            }else{
-                completionHandler?completionHandler([NSError errorWithDomain:@"omvideo" code:-1 userInfo:@{NSLocalizedDescriptionKey : @"裁剪区域有误." }]):nil;
-            }
+            [strongSelf cutVideoAsset:asset to:outputURL by:timeRange withPreset:preset outputFileType:outputFileType completionHandler:completionHandler];
         }
     }];
 }
@@ -175,5 +224,65 @@ SingletonM(OMVideoTool)
  */
 - (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withCompletionHandler:(CutCompletionHandler)completionHandler {
     [self cutVideo:URL to:outputURL by:timeRange withPreset:nil outputFileType:nil completionHandler:completionHandler];
+}
+
+/**
+ 裁剪视频
+ 
+ @param asset 本地视频
+ @param outputURL 输出URL
+ @param timeRange 裁剪时间
+ @param preset 视频质量
+ @param outputFileType 输出格式
+ @param completionHandler 回调
+ */
+- (void)cutVideoAsset:(AVAsset *)asset to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler {
+    CMTimeRange assetTimeRange = CMTimeRangeMake(kCMTimeZero, asset.duration);
+    CMTimeRange intersectionRange = CMTimeRangeGetIntersection(assetTimeRange, timeRange);
+    if (CMTIMERANGE_IS_VALID(intersectionRange) && CMTimeGetSeconds(intersectionRange.duration) > 0) {
+        NSString *videoPreset = preset.length ? preset : AVAssetExportPreset1280x720;
+        AVFileType videoFileType = outputFileType.length ? outputFileType : AVFileTypeQuickTimeMovie;
+        self.exportSession = [[AVAssetExportSession alloc]initWithAsset:asset presetName:videoPreset];
+        self.exportSession.outputFileType = videoFileType;
+        self.exportSession.outputURL = outputURL;
+        self.exportSession.timeRange = intersectionRange;
+        WEAKSELF
+        [self.exportSession exportAsynchronouslyWithCompletionHandler:^{
+            STRONGSELF
+            AVAssetExportSessionStatus status = strongSelf.exportSession.status;
+            if (status == AVAssetExportSessionStatusFailed) {
+                NSLog(@"error:%@",strongSelf.exportSession.error);
+                completionHandler ? completionHandler(strongSelf.exportSession.error):nil;
+            }else if (status == AVAssetExportSessionStatusCompleted) {
+                completionHandler ? completionHandler(nil):nil;
+            }
+        }];
+    }else{
+        completionHandler?completionHandler([NSError errorWithDomain:@"omvideo" code:-1 userInfo:@{NSLocalizedDescriptionKey : @"裁剪区域有误." }]):nil;
+    }
+}
+
+/**
+ 导出视频
+ 
+ @param asset 本地视频
+ @param outputURL 输出URL
+ @param completionHandler 回调
+ */
+- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withCompletionHandler:(CutCompletionHandler)completionHandler {
+    [self exportVideo:asset to:outputURL withPreset:nil outputFileType:nil completionHandler:completionHandler];
+}
+
+/**
+ 导出视频
+ 
+ @param asset 本地视频
+ @param outputURL 输出URL
+ @param preset 视频质量
+ @param outputFileType 输出格式
+ @param completionHandler 回调
+ */
+- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler {
+    [self cutVideoAsset:asset to:outputURL by:CMTimeRangeMake(kCMTimeZero, asset.duration) withPreset:preset outputFileType:outputFileType completionHandler:completionHandler];
 }
 @end
