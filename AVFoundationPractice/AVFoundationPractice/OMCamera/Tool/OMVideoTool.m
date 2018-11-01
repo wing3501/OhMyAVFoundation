@@ -14,6 +14,8 @@
 @property (nonatomic,strong) AVAssetWriter *assetWriter;
 /// 写队列
 @property (nonatomic,strong) dispatch_queue_t dispatchQueue;
+/// 导出会话
+@property (nonatomic,strong) AVAssetExportSession *exportSession;
 @end
 
 @implementation OMVideoTool
@@ -30,8 +32,9 @@ SingletonM(OMVideoTool)
 /**
  把视频从一个地址写到另一个地址(quicktime格式)
  
- @param inputURL 读入地址
- @param outputURL 写入地址
+ @param inputURL 视频输入URL
+ @param outputURL 视频输出URL
+ @param completionHandler 回调
  */
 - (void)writeVideoFrom:(NSURL *)inputURL to:(NSURL *)outputURL withCompletionHandler:(WriteCompletionHandler)completionHandler {
     //配置AVAssetReader
@@ -91,4 +94,86 @@ SingletonM(OMVideoTool)
     }];
 }
 
+/**
+ 加载本地视频资源
+ 
+ @param URL 视频URL
+ @param completionHandler 回调
+ */
++ (void)loadAsset:(NSURL *)URL withCompletionHandler:(LoadCompletionHandler)completionHandler {
+    NSDictionary *options = @{AVURLAssetPreferPreciseDurationAndTimingKey:@YES};//可以计算出时长和时间信息
+    AVAsset *asset = [AVURLAsset URLAssetWithURL:URL options:options];
+    NSArray *keys = @[@"tracks",@"duration",@"commonMetadata"];
+    [asset loadValuesAsynchronouslyForKeys:keys completionHandler:^{
+        NSError *error = nil;
+        AVKeyValueStatus status = [asset statusOfValueForKey:@"tracks" error:&error];
+        switch (status) {
+            case AVKeyValueStatusLoaded:
+                completionHandler?completionHandler(asset,nil):nil;
+                break;
+            case AVKeyValueStatusFailed:
+                completionHandler?completionHandler(nil,error):nil;
+                break;
+            case AVKeyValueStatusCancelled:
+                break;
+            default:
+                break;
+        }
+    }];
+}
+
+/**
+ 裁剪视频
+ 
+ @param URL 本地视频URL
+ @param outputURL 输出URL
+ @param timeRange 裁剪时间
+ @param preset 视频质量
+ @param outputFileType 输出格式
+ @param completionHandler 回调
+ */
+- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler {
+    WEAKSELF
+    [OMVideoTool loadAsset:URL withCompletionHandler:^(AVAsset * _Nullable asset, NSError * _Nullable error) {
+        STRONGSELF
+        if (error) {
+            completionHandler?completionHandler(error):nil;
+        }else{
+            CMTimeRange assetTimeRange = CMTimeRangeMake(kCMTimeZero, asset.duration);
+            CMTimeRange intersectionRange = CMTimeRangeGetIntersection(assetTimeRange, timeRange);
+            if (CMTIMERANGE_IS_VALID(intersectionRange) && CMTimeGetSeconds(intersectionRange.duration) > 0) {
+                NSString *videoPreset = preset.length ? preset : AVAssetExportPreset1280x720;
+                AVFileType videoFileType = outputFileType.length ? outputFileType : AVFileTypeQuickTimeMovie;
+                strongSelf.exportSession = [[AVAssetExportSession alloc]initWithAsset:asset presetName:videoPreset];
+                strongSelf.exportSession.outputFileType = videoFileType;
+                strongSelf.exportSession.outputURL = outputURL;
+                strongSelf.exportSession.timeRange = intersectionRange;
+                [strongSelf.exportSession exportAsynchronouslyWithCompletionHandler:^{
+                    STRONGSELF
+                    AVAssetExportSessionStatus status = strongSelf.exportSession.status;
+                    if (status == AVAssetExportSessionStatusFailed) {
+                        NSLog(@"error:%@",strongSelf.exportSession.error);
+                        completionHandler ? completionHandler(strongSelf.exportSession.error):nil;
+                    }else if (status == AVAssetExportSessionStatusCompleted) {
+                        completionHandler ? completionHandler(nil):nil;
+                    }
+                }];
+            }else{
+                completionHandler?completionHandler([NSError errorWithDomain:@"omvideo" code:-1 userInfo:@{NSLocalizedDescriptionKey : @"裁剪区域有误." }]):nil;
+            }
+        }
+    }];
+}
+
+/**
+ 裁剪视频
+ 
+ @param URL 本地视频URL
+ @param outputURL 输出URL
+ @param timeRange 裁剪时间
+ @param completionHandler 回调
+ */
+- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withCompletionHandler:(CutCompletionHandler)completionHandler {
+    [self cutVideo:URL to:outputURL by:timeRange withPreset:nil outputFileType:nil completionHandler:completionHandler];
+}
 @end

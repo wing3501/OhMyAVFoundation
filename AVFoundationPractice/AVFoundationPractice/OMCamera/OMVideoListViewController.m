@@ -9,7 +9,7 @@
 #import "OMVideoListViewController.h"
 #import "OMVideoModel.h"
 #import "OMAssetsLibraryTool.h"
-
+#import "OMVideoTool.h"
 @interface OMVideoListViewController ()<UITableViewDelegate,UITableViewDataSource>
 /// 列表
 @property (nonatomic,strong) UITableView *tableView;
@@ -90,30 +90,6 @@
 }
 
 /**
- 加载资源
- */
-- (void)loadAsset:(NSURL *)URL withCompletionBlock:(VoidBlock_id)completionBlock{
-    NSDictionary *options = @{AVURLAssetPreferPreciseDurationAndTimingKey:@YES};//可以计算出时长和时间信息
-    AVAsset *asset = [AVURLAsset URLAssetWithURL:URL options:options];
-    NSArray *keys = @[@"tracks",@"duration",@"commonMetadata"];
-    [asset loadValuesAsynchronouslyForKeys:keys completionHandler:^{
-        NSError *error = nil;
-        AVKeyValueStatus status = [asset statusOfValueForKey:@"tracks" error:&error];
-        switch (status) {
-            case AVKeyValueStatusLoaded:
-                completionBlock?completionBlock(asset):nil;
-                break;
-            case AVKeyValueStatusFailed:
-                break;
-            case AVKeyValueStatusCancelled:
-                break;
-            default:
-                break;
-        }
-    }];
-}
-
-/**
  裁剪(裁剪中间的一半)
  */
 - (void)cutting {
@@ -121,52 +97,64 @@
         [self showError:@"每次只能裁剪一个视频"];
         return;
     }
-    
     OMVideoModel *model = self.selectedArray.firstObject;
     WEAKSELF
-    [self loadAsset:[NSURL fileURLWithPath:model.filePath] withCompletionBlock:^(AVAsset *asset) {
+    NSURL *outputURL = [self outputURL];
+    CMTimeRange range = CMTimeRangeMake(CMTimeMake(5, 1), CMTimeMake(5, 1));//裁剪5秒
+    [[OMVideoTool sharedOMVideoTool]cutVideo:[NSURL fileURLWithPath:model.filePath] to:outputURL by:range withCompletionHandler:^(NSError * _Nullable error) {
         STRONGSELF
-        AVMutableComposition *composition = [AVMutableComposition composition];
-        AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-        AVMutableCompositionTrack *audioTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-        
-        int64_t value = [NSString stringWithFormat:@"%.0f",asset.duration.value * 0.25].intValue;
-        CMTime start = CMTimeMake(value, asset.duration.timescale);
-        CMTime duration = CMTimeMake(value * 2, asset.duration.timescale);
-        CMTimeRange range = CMTimeRangeMake(start, duration);
-        
-        AVAssetTrack *assetVideoTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
-        [videoTrack insertTimeRange:range ofTrack:assetVideoTrack atTime:kCMTimeZero error:nil];
-        videoTrack.preferredTransform = assetVideoTrack.preferredTransform;
-        
-        AVAssetTrack *assetAudioTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
-        [audioTrack insertTimeRange:range ofTrack:assetAudioTrack atTime:kCMTimeZero error:nil];
-        
-        //导出操作
-        NSURL *outputURL = [strongSelf outputURL];
-        NSString *preset = AVAssetExportPreset1280x720;
-        strongSelf.exportSession = [[AVAssetExportSession alloc]initWithAsset:composition presetName:preset];
-        strongSelf.exportSession.outputFileType = AVFileTypeQuickTimeMovie;
-        strongSelf.exportSession.outputURL = outputURL;
-        strongSelf.exportSession.timeRange = CMTimeRangeMake(kCMTimeZero, duration);
-        [strongSelf.exportSession exportAsynchronouslyWithCompletionHandler:^{
+        [strongSelf writeVideoToAssetsLibrary:outputURL];
+        dispatch_async(dispatch_get_main_queue(), ^{
             STRONGSELF
-            AVAssetExportSessionStatus status = strongSelf.exportSession.status;
-            if (status == AVAssetExportSessionStatusFailed) {
-                NSLog(@"error:%@",strongSelf.exportSession.error);
-            }
-            NSLog(@"导出结束...");
-            if (status == AVAssetExportSessionStatusCompleted) {
-                [strongSelf writeVideoToAssetsLibrary:outputURL];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    STRONGSELF
-                    [strongSelf.selectedArray removeAllObjects];
-                    [strongSelf setupData];
-                    [strongSelf.tableView reloadData];
-                });
-            }
-        }];
+            [strongSelf.selectedArray removeAllObjects];
+            [strongSelf setupData];
+            [strongSelf.tableView reloadData];
+        });
     }];
+    
+//    [OMVideoTool loadAsset:[NSURL fileURLWithPath:model.filePath] withCompletionHandler:^(AVAsset * _Nullable asset, NSError * _Nullable error) {
+//        STRONGSELF
+//        AVMutableComposition *composition = [AVMutableComposition composition];
+//        AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+//        AVMutableCompositionTrack *audioTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+//
+//        int64_t value = [NSString stringWithFormat:@"%.0f",asset.duration.value * 0.25].intValue;
+//        CMTime start = CMTimeMake(value, asset.duration.timescale);
+//        CMTime duration = CMTimeMake(value * 2, asset.duration.timescale);
+//        CMTimeRange range = CMTimeRangeMake(start, duration);
+//
+//        AVAssetTrack *assetVideoTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
+//        [videoTrack insertTimeRange:range ofTrack:assetVideoTrack atTime:kCMTimeZero error:nil];
+//        videoTrack.preferredTransform = assetVideoTrack.preferredTransform;
+//
+//        AVAssetTrack *assetAudioTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
+//        [audioTrack insertTimeRange:range ofTrack:assetAudioTrack atTime:kCMTimeZero error:nil];
+//
+//        //导出操作
+//        NSURL *outputURL = [strongSelf outputURL];
+//        NSString *preset = AVAssetExportPreset1280x720;
+//        strongSelf.exportSession = [[AVAssetExportSession alloc]initWithAsset:composition presetName:preset];
+//        strongSelf.exportSession.outputFileType = AVFileTypeQuickTimeMovie;
+//        strongSelf.exportSession.outputURL = outputURL;
+//        strongSelf.exportSession.timeRange = CMTimeRangeMake(kCMTimeZero, duration);
+//        [strongSelf.exportSession exportAsynchronouslyWithCompletionHandler:^{
+//            STRONGSELF
+//            AVAssetExportSessionStatus status = strongSelf.exportSession.status;
+//            if (status == AVAssetExportSessionStatusFailed) {
+//                NSLog(@"error:%@",strongSelf.exportSession.error);
+//            }
+//            NSLog(@"导出结束...");
+//            if (status == AVAssetExportSessionStatusCompleted) {
+//                [strongSelf writeVideoToAssetsLibrary:outputURL];
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    STRONGSELF
+//                    [strongSelf.selectedArray removeAllObjects];
+//                    [strongSelf setupData];
+//                    [strongSelf.tableView reloadData];
+//                });
+//            }
+//        }];
+//    }];
 }
 
 /**
