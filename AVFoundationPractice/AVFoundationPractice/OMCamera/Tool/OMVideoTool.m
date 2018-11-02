@@ -170,8 +170,8 @@ SingletonM(OMVideoTool)
     CMTime totalVideoDuration = cursorTime;//视频总长
     cursorTime = kCMTimeZero;
     //按顺序组合音频
-    for (NSUInteger i = 0; i < videoTrackModelArray.count; i++) {
-        OMAssetsTrackModel *assetsTrackModel = videoTrackModelArray[i];
+    for (NSUInteger i = 0; i < audioTrackModelArray.count; i++) {
+        OMAssetsTrackModel *assetsTrackModel = audioTrackModelArray[i];
         AVAssetTrack *assetTrack = [assetsTrackModel.asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
         CMTime audioDuration = assetsTrackModel.timeRange.duration;
         if (CMTIME_COMPARE_INLINE(CMTimeAdd(cursorTime, audioDuration), >, totalVideoDuration)) {
