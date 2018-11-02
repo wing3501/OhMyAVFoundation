@@ -113,9 +113,9 @@ SingletonM(OMVideoTool)
 }
 
 /**
- 加载本地视频资源
+ 加载本地资源
  
- @param URL 视频URL
+ @param URL 资源URL
  @param completionHandler 回调
  */
 + (void)loadAsset:(NSURL *)URL withCompletionHandler:(LoadCompletionHandler)completionHandler {
@@ -138,6 +138,33 @@ SingletonM(OMVideoTool)
                 break;
         }
     }];
+}
+
+/**
+ 加载一组本地资源
+ 
+ @param URLArray 资源URL数组
+ @param completionHandler 回调
+ */
++ (void)loadAssets:(NSArray *)URLArray withCompletionHandler:(CompletionHandler)completionHandler {
+    __block NSUInteger completionCount = 0;
+    __block BOOL stopCallBack = NO;
+    for (NSURL *URL in URLArray) {
+        [OMVideoTool loadAsset:URL withCompletionHandler:^(AVAsset * _Nullable asset, NSError * _Nullable error) {
+            if (stopCallBack) {
+                return;
+            }
+            if (error) {
+                completionHandler?completionHandler(error):nil;
+                stopCallBack = YES;
+            }else{
+                if (++completionCount == URLArray.count) {
+                    //全部加载完成了
+                    completionHandler?completionHandler(nil):nil;
+                }
+            }
+        }];
+    }
 }
 
 /**
@@ -202,7 +229,7 @@ SingletonM(OMVideoTool)
  @param outputFileType 输出格式
  @param completionHandler 回调
  */
-- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler {
+- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CompletionHandler)completionHandler {
     WEAKSELF
     [OMVideoTool loadAsset:URL withCompletionHandler:^(AVAsset * _Nullable asset, NSError * _Nullable error) {
         STRONGSELF
@@ -222,7 +249,7 @@ SingletonM(OMVideoTool)
  @param timeRange 裁剪时间
  @param completionHandler 回调
  */
-- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withCompletionHandler:(CutCompletionHandler)completionHandler {
+- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withCompletionHandler:(CompletionHandler)completionHandler {
     [self cutVideo:URL to:outputURL by:timeRange withPreset:nil outputFileType:nil completionHandler:completionHandler];
 }
 
@@ -236,7 +263,7 @@ SingletonM(OMVideoTool)
  @param outputFileType 输出格式
  @param completionHandler 回调
  */
-- (void)cutVideoAsset:(AVAsset *)asset to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler {
+- (void)cutVideoAsset:(AVAsset *)asset to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CompletionHandler)completionHandler {
     CMTimeRange assetTimeRange = CMTimeRangeMake(kCMTimeZero, asset.duration);
     CMTimeRange intersectionRange = CMTimeRangeGetIntersection(assetTimeRange, timeRange);
     if (CMTIMERANGE_IS_VALID(intersectionRange) && CMTimeGetSeconds(intersectionRange.duration) > 0) {
@@ -269,7 +296,7 @@ SingletonM(OMVideoTool)
  @param outputURL 输出URL
  @param completionHandler 回调
  */
-- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withCompletionHandler:(CutCompletionHandler)completionHandler {
+- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withCompletionHandler:(CompletionHandler)completionHandler {
     [self exportVideo:asset to:outputURL withPreset:nil outputFileType:nil completionHandler:completionHandler];
 }
 
@@ -282,7 +309,7 @@ SingletonM(OMVideoTool)
  @param outputFileType 输出格式
  @param completionHandler 回调
  */
-- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler {
+- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CompletionHandler)completionHandler {
     [self cutVideoAsset:asset to:outputURL by:CMTimeRangeMake(kCMTimeZero, asset.duration) withPreset:preset outputFileType:outputFileType completionHandler:completionHandler];
 }
 @end

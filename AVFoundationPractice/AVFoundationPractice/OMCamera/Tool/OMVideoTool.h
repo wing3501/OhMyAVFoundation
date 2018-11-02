@@ -10,7 +10,7 @@
 
 typedef void(^WriteCompletionHandler)(NSURL * _Nullable URL, NSError * _Nullable error);
 typedef void(^LoadCompletionHandler)(AVAsset * _Nullable asset, NSError * _Nullable error);
-typedef void(^CutCompletionHandler)(NSError * _Nullable error);
+typedef void(^CompletionHandler)(NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,13 +30,20 @@ NS_ASSUME_NONNULL_BEGIN
 SingletonH(OMVideoTool)
 
 /**
- 加载本地视频资源
+ 加载本地资源
  
- @param URL 视频URL
+ @param URL 资源URL
  @param completionHandler 回调
  */
 + (void)loadAsset:(NSURL *)URL withCompletionHandler:(LoadCompletionHandler)completionHandler;
 
+/**
+  加载一组本地资源
+
+ @param URLArray 资源URL数组
+ @param completionHandler 回调
+ */
++ (void)loadAssets:(NSArray *)URLArray withCompletionHandler:(CompletionHandler)completionHandler;
 /**
  按顺序组合视频、音频
 
@@ -65,7 +72,7 @@ SingletonH(OMVideoTool)
  @param outputFileType 输出格式
  @param completionHandler 回调
  */
-- (void)cutVideoAsset:(AVAsset *)asset to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler;
+- (void)cutVideoAsset:(AVAsset *)asset to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CompletionHandler)completionHandler;
 
 /**
  裁剪视频
@@ -75,7 +82,7 @@ SingletonH(OMVideoTool)
  @param timeRange 裁剪时间
  @param completionHandler 回调
  */
-- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withCompletionHandler:(CutCompletionHandler)completionHandler;
+- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withCompletionHandler:(CompletionHandler)completionHandler;
 
 /**
  裁剪视频
@@ -87,7 +94,7 @@ SingletonH(OMVideoTool)
  @param outputFileType 输出格式
  @param completionHandler 回调
  */
-- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler;
+- (void)cutVideo:(NSURL *)URL to:(NSURL *)outputURL by:(CMTimeRange)timeRange withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CompletionHandler)completionHandler;
 
 /**
  导出视频
@@ -96,7 +103,7 @@ SingletonH(OMVideoTool)
  @param outputURL 输出URL
  @param completionHandler 回调
  */
-- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withCompletionHandler:(CutCompletionHandler)completionHandler;
+- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withCompletionHandler:(CompletionHandler)completionHandler;
 
 /**
  导出视频
@@ -107,7 +114,7 @@ SingletonH(OMVideoTool)
  @param outputFileType 输出格式
  @param completionHandler 回调
  */
-- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CutCompletionHandler)completionHandler;
+- (void)exportVideo:(AVAsset *)asset to:(NSURL *)outputURL withPreset:(NSString * _Nullable)preset outputFileType:(AVFileType _Nullable)outputFileType completionHandler:(CompletionHandler)completionHandler;
 @end
 
 NS_ASSUME_NONNULL_END
