@@ -32,6 +32,8 @@
 		62EFCD86217DB6A800B5D5DB /* OMVideoListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62EFCD85217DB6A800B5D5DB /* OMVideoListViewController.m */; };
 		62EFCD8A217DBDE600B5D5DB /* OMVideoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 62EFCD89217DBDE600B5D5DB /* OMVideoModel.m */; };
 		62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2DF822177530E003C0D2D /* AVCaptureDevice+Ext.m */; };
+		62F808FD221694BB000EFA19 /* FXYCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F808FC221694BB000EFA19 /* FXYCameraViewController.m */; };
+		62F809002216953B000EFA19 /* FXYCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F808FF2216953B000EFA19 /* FXYCameraManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +82,10 @@
 		62EFCD89217DBDE600B5D5DB /* OMVideoModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMVideoModel.m; sourceTree = "<group>"; };
 		62F2DF812177530E003C0D2D /* AVCaptureDevice+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AVCaptureDevice+Ext.h"; sourceTree = "<group>"; };
 		62F2DF822177530E003C0D2D /* AVCaptureDevice+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "AVCaptureDevice+Ext.m"; sourceTree = "<group>"; };
+		62F808FB221694BB000EFA19 /* FXYCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYCameraViewController.h; sourceTree = "<group>"; };
+		62F808FC221694BB000EFA19 /* FXYCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYCameraViewController.m; sourceTree = "<group>"; };
+		62F808FE2216953B000EFA19 /* FXYCameraManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYCameraManager.h; sourceTree = "<group>"; };
+		62F808FF2216953B000EFA19 /* FXYCameraManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYCameraManager.m; sourceTree = "<group>"; };
 		63CC57AFF2DB4CE123B7B59D /* Pods-AVFoundationPractice.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVFoundationPractice.release.xcconfig"; path = "Pods/Target Support Files/Pods-AVFoundationPractice/Pods-AVFoundationPractice.release.xcconfig"; sourceTree = "<group>"; };
 		F48EF586A560AD70BD792ACF /* libPods-AVFoundationPractice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AVFoundationPractice.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -121,6 +127,7 @@
 				6217976F216F4F1400AC1756 /* AppDelegate.m */,
 				62179771216F4F1400AC1756 /* ViewController.h */,
 				62179772216F4F1400AC1756 /* ViewController.m */,
+				62F808FA2216948B000EFA19 /* FXYCamera */,
 				62C7D3D32178610200EAF19B /* Resources */,
 				6245A72C21707AC60011AB4C /* OMCamera */,
 				6245A72B21704DB70011AB4C /* PrefixHeader.pch */,
@@ -210,6 +217,17 @@
 				62EFCD89217DBDE600B5D5DB /* OMVideoModel.m */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		62F808FA2216948B000EFA19 /* FXYCamera */ = {
+			isa = PBXGroup;
+			children = (
+				62F808FB221694BB000EFA19 /* FXYCameraViewController.h */,
+				62F808FC221694BB000EFA19 /* FXYCameraViewController.m */,
+				62F808FE2216953B000EFA19 /* FXYCameraManager.h */,
+				62F808FF2216953B000EFA19 /* FXYCameraManager.m */,
+			);
+			path = FXYCamera;
 			sourceTree = "<group>";
 		};
 		641062172DE6C87269ADAC21 /* Frameworks */ = {
@@ -356,6 +374,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62F809002216953B000EFA19 /* FXYCameraManager.m in Sources */,
 				6245A72F21707B4C0011AB4C /* OMCameraManager.m in Sources */,
 				62EFCD8A217DBDE600B5D5DB /* OMVideoModel.m in Sources */,
 				62179773216F4F1400AC1756 /* ViewController.m in Sources */,
@@ -371,6 +390,7 @@
 				62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */,
 				62C207972179851C00D6A478 /* OMPreviewView.m in Sources */,
 				62C2079D217989A000D6A478 /* OMPhotoFilters.m in Sources */,
+				62F808FD221694BB000EFA19 /* FXYCameraViewController.m in Sources */,
 				62179770216F4F1400AC1756 /* AppDelegate.m in Sources */,
 				6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */,
 				62C2079421797DBB00D6A478 /* OMFilterCameraViewController.m in Sources */,

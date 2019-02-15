@@ -71,9 +71,8 @@
 - (void)commonInit {
     NSError *error;
     if ([self.cameraManager setupSession:&error]) {
-        [self.cameraManager startSession];
         [self.view.layer addSublayer:self.videoPreviewLayer];
-        
+        [self.cameraManager startSession];
         //人脸识别图层
         [self.videoPreviewLayer addSublayer:self.overlayLayer];
     } else {

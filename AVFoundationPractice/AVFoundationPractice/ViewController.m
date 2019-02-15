@@ -12,6 +12,7 @@
 #import "OMVideoWriteViewController.h"
 #import "OMFilterCameraViewController.h"
 #import "OMVideoListViewController.h"
+#import "FXYCameraViewController.h"
 @interface ViewController ()
 /// 列表
 @property (nonatomic,strong) NSArray *dataArray;
@@ -25,7 +26,8 @@
     _dataArray = @[@{@"name":@"自定义相机",@"method":@"cameraViewController"},
                    @{@"name":@"视频读写",@"method":@"videoWriteViewController"},
                    @{@"name":@"滤镜相机(打开VideoDataOutputON)",@"method":@"filterCameraViewController"},
-                   @{@"name":@"视频编辑",@"method":@"videoListViewController"}
+                   @{@"name":@"视频编辑",@"method":@"videoListViewController"},
+                   @{@"name":@"仿闲鱼相机",@"method":@"fxyCameraViewController"}
                    ];
 }
 
@@ -67,6 +69,11 @@
 
 - (void)videoListViewController {
     OMVideoListViewController *vc = [[OMVideoListViewController alloc]init];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)fxyCameraViewController {
+    FXYCameraViewController *vc = [[FXYCameraViewController alloc]init];
     [self.navigationController pushViewController:vc animated:YES];
 }
 @end

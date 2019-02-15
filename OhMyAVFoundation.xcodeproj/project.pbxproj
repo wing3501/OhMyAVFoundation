@@ -595,7 +595,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 248E7966L8;
+				DEVELOPMENT_TEAM = K9X5AAY2EF;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/OhMyAVFoundation/PrefixHeader.pch";
 				INFOPLIST_FILE = OhMyAVFoundation/Info.plist;
@@ -615,7 +615,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 248E7966L8;
+				DEVELOPMENT_TEAM = K9X5AAY2EF;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/OhMyAVFoundation/PrefixHeader.pch";
 				INFOPLIST_FILE = OhMyAVFoundation/Info.plist;
