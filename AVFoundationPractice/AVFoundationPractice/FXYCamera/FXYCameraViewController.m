@@ -24,6 +24,8 @@
 @property (nonatomic,strong) UIButton *torchButton;
 /// 闪光灯按钮
 @property (nonatomic,strong) UIButton *flashButton;
+/// 比例按钮
+@property (nonatomic, strong) UIButton *rateButton;
 
 // 对焦和曝光
 /// 对焦动画视图
@@ -52,9 +54,11 @@
  初始化
  */
 - (void)commonInit {
+    [self.navigationController setNavigationBarHidden:YES];
     NSError *error;
     if ([self.cameraManager setupSession:&error]) {
         [self.view.layer addSublayer:self.videoPreviewLayer];
+        [self setupRate:NO];
         [self.cameraManager startSession];
     } else {
         NSLog(@"Error: %@", [error localizedDescription]);
@@ -76,6 +80,7 @@
     [self.view addSubview:self.switchCameraButton];
     [self.view addSubview:self.torchButton];
     [self.view addSubview:self.flashButton];
+    [self.view addSubview:self.rateButton];
     
     [self.view addGestureRecognizer:self.singleTapRecognizer];
     [self.view addGestureRecognizer:self.doubleTapRecognizer];
@@ -149,7 +154,28 @@
     [self.cameraManager resetFocusAndExposureModes];
 }
 
+/**
+ 改变比例
+ */
+- (void)changeRate:(UIButton *)button {
+    button.selected = !button.selected;
+    [self setupRate:button.selected];
+}
+
 #pragma mark - private
+
+/**
+ 设置拍摄比例
+
+ @param isSquare 是否正方形
+ */
+- (void)setupRate:(BOOL)isSquare {
+    CGFloat height43 = floor(ScreenWidth * 4 / 3.0);
+    CGFloat bottomHeight = ScreenHeight - height43;
+    CGRect rect43 = CGRectMake(0, 0, ScreenWidth, height43);
+    CGRect rect11 = CGRectMake(0, ScreenHeight - bottomHeight - ScreenWidth, ScreenWidth, ScreenWidth);
+    _videoPreviewLayer.frame = isSquare ? rect11 : rect43;
+}
 
 - (NSString *)torchStatus {
     switch (self.cameraManager.torchMode) {
@@ -371,7 +397,6 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
 - (AVCaptureVideoPreviewLayer *)videoPreviewLayer {
     if (!_videoPreviewLayer) {
         _videoPreviewLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.cameraManager.captureSession];
-        _videoPreviewLayer.frame = self.view.bounds;
         [_videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
     }
     return _videoPreviewLayer;
@@ -480,4 +505,16 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
     return _exposureBox;
 }
 
+- (UIButton *)rateButton {
+    if (!_rateButton) {
+        _rateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_rateButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [_rateButton setTitle:@"3 : 4" forState:UIControlStateNormal];
+        [_rateButton setTitle:@"1 : 1" forState:UIControlStateSelected];
+        [_rateButton addTarget:self action:@selector(changeRate:) forControlEvents:UIControlEventTouchUpInside];
+        _rateButton.backgroundColor = [UIColor whiteColor];
+        _rateButton.frame = CGRectMake(ScreenWidth - 90 - 50, 30, 50, 21);
+    }
+    return _rateButton;
+}
 @end

@@ -74,6 +74,6 @@
 
 - (void)fxyCameraViewController {
     FXYCameraViewController *vc = [[FXYCameraViewController alloc]init];
-    [self.navigationController pushViewController:vc animated:YES];
+    [self presentViewController:vc animated:YES completion:nil];
 }
 @end
