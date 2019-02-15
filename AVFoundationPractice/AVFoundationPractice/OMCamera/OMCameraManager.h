@@ -68,7 +68,7 @@ static const CGFloat kMaxZoomFactor = 4.0f;
 
 @interface OMCameraManager : NSObject
 /// 代理
-@property (nonatomic,strong) id<OMCameraManagerDelegate> delegate;
+@property (nonatomic,weak) id<OMCameraManagerDelegate> delegate;
 /// 捕捉会话
 @property (nonatomic,strong,readonly) AVCaptureSession *captureSession;
 /// 是否正在录制

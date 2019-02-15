@@ -81,6 +81,10 @@
     [self setupUI];
 }
 
+- (void)dealloc {
+    [self.cameraManager stopSession];
+}
+
 /**
  设置视图
  */

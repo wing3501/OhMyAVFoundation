@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FXYCameraManager : NSObject
 /// 代理
-@property (nonatomic,strong) id<FXYCameraManagerDelegate> delegate;
+@property (nonatomic,weak) id<FXYCameraManagerDelegate> delegate;
 /// 捕捉会话
 @property (nonatomic,strong,readonly) AVCaptureSession *captureSession;
 /// 是否正在录制
