@@ -81,6 +81,7 @@ static NSTimeInterval const kTimelimit = 15.0;
         }
     }
     self.displayLink.paused = !self.displayLink.paused;
+    !self.clickBlock ?: self.clickBlock(self.displayLink.paused);
 }
 
 /**

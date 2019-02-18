@@ -306,13 +306,6 @@
 //    [self.cameraManager captureStillImage];//拍照
 //}
 //
-//- (void)progressViewBeganLongPress:(OMCircleProgressView *)progressView {
-//    [self.cameraManager startRecording];//开始录制视频
-//}
-//
-//- (void)progressViewStopCountDown:(OMCircleProgressView *)progressView {
-//    [self.cameraManager stopRecording];//停止录制视频
-//}
 
 #pragma mark - FXYCameraManagerDelegate
 
@@ -349,6 +342,11 @@
         CGFloat height43 = floor(ScreenWidth * 4 / 3.0);
         CGFloat bottomHeight = ScreenHeight - height43;
         _progressView = [[FXYCircleProgressView alloc]initWithFrame:CGRectMake(ScreenWidth * 0.5 - 40, bottomHeight * 0.5 - 40, 80, 80)];
+        WEAKSELF
+        _progressView.clickBlock = ^(BOOL isStop) {
+            STRONGSELF
+            isStop ? [strongSelf.cameraManager stopRecording] : [strongSelf.cameraManager startRecording];
+        };
     }
     return _progressView;
 }
