@@ -81,7 +81,6 @@ static NSTimeInterval const kTimelimit = 15.0;
         }
     }
     self.displayLink.paused = !self.displayLink.paused;
-    !self.clickBlock ?: self.clickBlock(self.displayLink.paused);
 }
 
 /**
@@ -97,7 +96,7 @@ static NSTimeInterval const kTimelimit = 15.0;
     UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:self.shapeLayer.center radius:self.shapeLayer.center.x - 5 startAngle:-M_PI_2 endAngle:-M_PI_2 + M_PI * 2 * progress clockwise:YES];
     self.shapeLayer.path = path.CGPath;
     if (progress >= 1) {
-        self.displayLink.paused = NO;
+        self.displayLink.paused = YES;
     }
 }
 #pragma mark - private
