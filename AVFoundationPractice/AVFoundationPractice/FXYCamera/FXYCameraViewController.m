@@ -8,14 +8,16 @@
 
 #import "FXYCameraViewController.h"
 #import "FXYCameraManager.h"
-#import "OMCircleProgressView.h"
-@interface FXYCameraViewController ()<OMCircleProgressViewDelegate,FXYCameraManagerDelegate>
+#import "FXYCircleProgressView.h"
+@interface FXYCameraViewController ()<FXYCameraManagerDelegate>
 /// 相机管理器
 @property (nonatomic,strong) FXYCameraManager *cameraManager;
 /// 预览图层
 @property (nonatomic,strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
+/// 底部视图
+@property (nonatomic, strong) UIView *bottomView;
 /// 拍摄按钮
-@property (nonatomic,strong) OMCircleProgressView *progressView;
+@property (nonatomic,strong) FXYCircleProgressView *progressView;
 /// 关闭按钮
 @property (nonatomic,strong) UIButton *closeButton;
 /// 切换摄像头按钮
@@ -75,8 +77,9 @@
  */
 - (void)setupUI {
     self.view.backgroundColor = [UIColor blackColor];
-    [self.view addSubview:self.progressView];
-    [self.view addSubview:self.closeButton];
+    [self.view addSubview:self.bottomView];
+    [self.bottomView addSubview:self.progressView];
+    [self.bottomView addSubview:self.closeButton];
     [self.view addSubview:self.switchCameraButton];
     [self.view addSubview:self.torchButton];
     [self.view addSubview:self.flashButton];
@@ -252,77 +255,6 @@
 }
 
 /**
- 应用视角转换
- */
-static CATransform3D CATransform3DMakePerspective(CGFloat eyePosition) {
-    CATransform3D transform = CATransform3DIdentity;
-    transform.m34 = -1.0 / eyePosition;
-    return transform;
-}
-
-/**
- 把设备坐标空间的对象转换为视图空间对象集合
- */
-- (NSArray *)transformedObjsFromObjs:(NSArray *)objs {
-    NSMutableArray *transformedObjs = [NSMutableArray array];
-    for (AVMetadataObject *obj in objs) {
-        AVMetadataObject *transformedObj = [self.videoPreviewLayer transformedMetadataObjectForMetadataObject:obj];
-        [transformedObjs addObject:transformedObj];
-    }
-    return transformedObjs;
-}
-
-/**
- 创建一个人脸图层
- */
-- (CALayer *)makeFaceLayer {
-    CALayer *layer = [CALayer layer];
-    layer.borderWidth = 5.0f;
-    layer.borderColor =
-    [UIColor colorWithRed:0.188 green:0.517 blue:0.877 alpha:1.000].CGColor;
-    return layer;
-}
-
-// Rotate around Z-axis
-- (CATransform3D)transformForRollAngle:(CGFloat)rollAngleInDegrees {
-    CGFloat rollAngleInRadians = OMDegreesToRadians(rollAngleInDegrees);
-    return CATransform3DMakeRotation(rollAngleInRadians, 0.0f, 0.0f, 1.0f);
-}
-
-// Rotate around Y-axis
-- (CATransform3D)transformForYawAngle:(CGFloat)yawAngleInDegrees {
-    CGFloat yawAngleInRadians = OMDegreesToRadians(yawAngleInDegrees);
-    CATransform3D yawTransform = CATransform3DMakeRotation(yawAngleInRadians, 0.0f, -1.0f, 0.0f);
-    return CATransform3DConcat(yawTransform, [self orientationTransform]);//需要为设备方向计算一个相应的旋转变换，否则人脸的偏转将不正确
-}
-
-- (CATransform3D)orientationTransform {
-    CGFloat angle = 0.0;
-    switch ([UIDevice currentDevice].orientation) {
-        case UIDeviceOrientationPortraitUpsideDown:
-            angle = M_PI;
-            break;
-        case UIDeviceOrientationLandscapeRight:
-            angle = -M_PI / 2.0f;
-            break;
-        case UIDeviceOrientationLandscapeLeft:
-            angle = M_PI / 2.0f;
-            break;
-        default: // as UIDeviceOrientationPortrait
-            angle = 0.0;
-            break;
-    }
-    return CATransform3DMakeRotation(angle, 0.0f, 0.0f, 1.0f);
-}
-
-/**
- 弧度
- */
-static CGFloat OMDegreesToRadians(CGFloat degrees) {
-    return degrees * M_PI / 180;
-}
-
-/**
  创建一个方形图层
  */
 - (CAShapeLayer *)makeBoundsLayer {
@@ -370,17 +302,17 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
 }
 #pragma mark - OMCircleProgressViewDelegate
 
-- (void)progressViewDidSingleTap:(OMCircleProgressView *)progressView {
-    [self.cameraManager captureStillImage];//拍照
-}
-
-- (void)progressViewBeganLongPress:(OMCircleProgressView *)progressView {
-    [self.cameraManager startRecording];//开始录制视频
-}
-
-- (void)progressViewStopCountDown:(OMCircleProgressView *)progressView {
-    [self.cameraManager stopRecording];//停止录制视频
-}
+//- (void)progressViewDidSingleTap:(OMCircleProgressView *)progressView {
+//    [self.cameraManager captureStillImage];//拍照
+//}
+//
+//- (void)progressViewBeganLongPress:(OMCircleProgressView *)progressView {
+//    [self.cameraManager startRecording];//开始录制视频
+//}
+//
+//- (void)progressViewStopCountDown:(OMCircleProgressView *)progressView {
+//    [self.cameraManager stopRecording];//停止录制视频
+//}
 
 #pragma mark - FXYCameraManagerDelegate
 
@@ -402,10 +334,21 @@ static CGFloat OMDegreesToRadians(CGFloat degrees) {
     return _videoPreviewLayer;
 }
 
-- (OMCircleProgressView *)progressView {
+- (UIView *)bottomView {
+    if (!_bottomView) {
+        CGFloat height43 = floor(ScreenWidth * 4 / 3.0);
+        CGFloat bottomHeight = ScreenHeight - height43;
+        _bottomView = [[UIView alloc]initWithFrame:CGRectMake(0, ScreenHeight - bottomHeight, ScreenWidth, bottomHeight)];
+        _bottomView.backgroundColor = [UIColor whiteColor];
+    }
+    return _bottomView;
+}
+
+- (FXYCircleProgressView *)progressView {
     if (!_progressView) {
-        _progressView = [[OMCircleProgressView alloc]initWithFrame:CGRectMake(ScreenWidth * 0.5 - 40, ScreenHeight - 120, 80, 80)];
-        _progressView.delegate = self;
+        CGFloat height43 = floor(ScreenWidth * 4 / 3.0);
+        CGFloat bottomHeight = ScreenHeight - height43;
+        _progressView = [[FXYCircleProgressView alloc]initWithFrame:CGRectMake(ScreenWidth * 0.5 - 40, bottomHeight * 0.5 - 40, 80, 80)];
     }
     return _progressView;
 }

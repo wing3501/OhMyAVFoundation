@@ -34,6 +34,7 @@
 		62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2DF822177530E003C0D2D /* AVCaptureDevice+Ext.m */; };
 		62F808FD221694BB000EFA19 /* FXYCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F808FC221694BB000EFA19 /* FXYCameraViewController.m */; };
 		62F809002216953B000EFA19 /* FXYCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F808FF2216953B000EFA19 /* FXYCameraManager.m */; };
+		62F809032216BC8B000EFA19 /* FXYCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F809022216BC8B000EFA19 /* FXYCircleProgressView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -86,6 +87,8 @@
 		62F808FC221694BB000EFA19 /* FXYCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYCameraViewController.m; sourceTree = "<group>"; };
 		62F808FE2216953B000EFA19 /* FXYCameraManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYCameraManager.h; sourceTree = "<group>"; };
 		62F808FF2216953B000EFA19 /* FXYCameraManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYCameraManager.m; sourceTree = "<group>"; };
+		62F809012216BC8B000EFA19 /* FXYCircleProgressView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYCircleProgressView.h; sourceTree = "<group>"; };
+		62F809022216BC8B000EFA19 /* FXYCircleProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYCircleProgressView.m; sourceTree = "<group>"; };
 		63CC57AFF2DB4CE123B7B59D /* Pods-AVFoundationPractice.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVFoundationPractice.release.xcconfig"; path = "Pods/Target Support Files/Pods-AVFoundationPractice/Pods-AVFoundationPractice.release.xcconfig"; sourceTree = "<group>"; };
 		F48EF586A560AD70BD792ACF /* libPods-AVFoundationPractice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AVFoundationPractice.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -226,6 +229,8 @@
 				62F808FC221694BB000EFA19 /* FXYCameraViewController.m */,
 				62F808FE2216953B000EFA19 /* FXYCameraManager.h */,
 				62F808FF2216953B000EFA19 /* FXYCameraManager.m */,
+				62F809012216BC8B000EFA19 /* FXYCircleProgressView.h */,
+				62F809022216BC8B000EFA19 /* FXYCircleProgressView.m */,
 			);
 			path = FXYCamera;
 			sourceTree = "<group>";
@@ -376,6 +381,7 @@
 			files = (
 				62F809002216953B000EFA19 /* FXYCameraManager.m in Sources */,
 				6245A72F21707B4C0011AB4C /* OMCameraManager.m in Sources */,
+				62F809032216BC8B000EFA19 /* FXYCircleProgressView.m in Sources */,
 				62EFCD8A217DBDE600B5D5DB /* OMVideoModel.m in Sources */,
 				62179773216F4F1400AC1756 /* ViewController.m in Sources */,
 				62EFCD86217DB6A800B5D5DB /* OMVideoListViewController.m in Sources */,

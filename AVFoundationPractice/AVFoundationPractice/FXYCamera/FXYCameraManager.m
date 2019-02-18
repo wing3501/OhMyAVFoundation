@@ -25,8 +25,6 @@ static const NSString *OMCameraAdjustingExposureContext;
 @property (nonatomic,weak) AVCaptureDeviceInput *activeVideoInput;
 /// 视频文件输出
 @property (nonatomic,strong) AVCaptureMovieFileOutput *movieOutput;
-/// 视频数据输出(帧处理)
-@property (nonatomic,strong) AVCaptureVideoDataOutput *videoDataOutput;
 /// 音频数据输出
 @property (nonatomic,strong) AVCaptureAudioDataOutput *audioDataOutput;
 /// 视频写入
