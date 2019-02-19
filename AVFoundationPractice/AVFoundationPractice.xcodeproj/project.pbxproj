@@ -8,6 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		384689749E559C731C1734E8 /* libPods-AVFoundationPractice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F48EF586A560AD70BD792ACF /* libPods-AVFoundationPractice.a */; };
+		6205C930221BF31A00B576C2 /* FXYImagePickerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C92F221BF31A00B576C2 /* FXYImagePickerController.m */; };
+		6205C933221BF53100B576C2 /* FXYImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C932221BF53100B576C2 /* FXYImageManager.m */; };
+		6205C936221BF55600B576C2 /* FXYAssetModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C935221BF55600B576C2 /* FXYAssetModel.m */; };
+		6205C93C221BF67200B576C2 /* FXYAlbumModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C93B221BF67200B576C2 /* FXYAlbumModel.m */; };
+		6205C93F221BFA7300B576C2 /* FXYImagePickerConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C93E221BFA7300B576C2 /* FXYImagePickerConfig.m */; };
+		6205C942221BFAFE00B576C2 /* FXYPhotoPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C941221BFAFE00B576C2 /* FXYPhotoPreviewView.m */; };
+		6205C945221BFBA100B576C2 /* FXYProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C944221BFBA100B576C2 /* FXYProgressView.m */; };
+		6205C94B221BFEAD00B576C2 /* UIView+FXYLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C94A221BFEAD00B576C2 /* UIView+FXYLayout.m */; };
+		6205C94E221C0F8F00B576C2 /* NSBundle+FXYImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 6205C94D221C0F8F00B576C2 /* NSBundle+FXYImagePicker.m */; };
+		6205C950221C102A00B576C2 /* FXYImagePickerController.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6205C94F221C102A00B576C2 /* FXYImagePickerController.bundle */; };
 		62179770216F4F1400AC1756 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6217976F216F4F1400AC1756 /* AppDelegate.m */; };
 		62179773216F4F1400AC1756 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62179772216F4F1400AC1756 /* ViewController.m */; };
 		62179776216F4F1400AC1756 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 62179774216F4F1400AC1756 /* Main.storyboard */; };
@@ -39,6 +49,25 @@
 
 /* Begin PBXFileReference section */
 		0C20722E37171DA670C0B269 /* Pods-AVFoundationPractice.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVFoundationPractice.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AVFoundationPractice/Pods-AVFoundationPractice.debug.xcconfig"; sourceTree = "<group>"; };
+		6205C92E221BF31A00B576C2 /* FXYImagePickerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYImagePickerController.h; sourceTree = "<group>"; };
+		6205C92F221BF31A00B576C2 /* FXYImagePickerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYImagePickerController.m; sourceTree = "<group>"; };
+		6205C931221BF53100B576C2 /* FXYImageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYImageManager.h; sourceTree = "<group>"; };
+		6205C932221BF53100B576C2 /* FXYImageManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYImageManager.m; sourceTree = "<group>"; };
+		6205C934221BF55600B576C2 /* FXYAssetModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYAssetModel.h; sourceTree = "<group>"; };
+		6205C935221BF55600B576C2 /* FXYAssetModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYAssetModel.m; sourceTree = "<group>"; };
+		6205C93A221BF67200B576C2 /* FXYAlbumModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYAlbumModel.h; sourceTree = "<group>"; };
+		6205C93B221BF67200B576C2 /* FXYAlbumModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYAlbumModel.m; sourceTree = "<group>"; };
+		6205C93D221BFA7300B576C2 /* FXYImagePickerConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYImagePickerConfig.h; sourceTree = "<group>"; };
+		6205C93E221BFA7300B576C2 /* FXYImagePickerConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYImagePickerConfig.m; sourceTree = "<group>"; };
+		6205C940221BFAFE00B576C2 /* FXYPhotoPreviewView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYPhotoPreviewView.h; sourceTree = "<group>"; };
+		6205C941221BFAFE00B576C2 /* FXYPhotoPreviewView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYPhotoPreviewView.m; sourceTree = "<group>"; };
+		6205C943221BFBA100B576C2 /* FXYProgressView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYProgressView.h; sourceTree = "<group>"; };
+		6205C944221BFBA100B576C2 /* FXYProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYProgressView.m; sourceTree = "<group>"; };
+		6205C949221BFEAD00B576C2 /* UIView+FXYLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+FXYLayout.h"; sourceTree = "<group>"; };
+		6205C94A221BFEAD00B576C2 /* UIView+FXYLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+FXYLayout.m"; sourceTree = "<group>"; };
+		6205C94C221C0F8F00B576C2 /* NSBundle+FXYImagePicker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSBundle+FXYImagePicker.h"; sourceTree = "<group>"; };
+		6205C94D221C0F8F00B576C2 /* NSBundle+FXYImagePicker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+FXYImagePicker.m"; sourceTree = "<group>"; };
+		6205C94F221C102A00B576C2 /* FXYImagePickerController.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = FXYImagePickerController.bundle; sourceTree = "<group>"; };
 		6217976B216F4F1400AC1756 /* AVFoundationPractice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AVFoundationPractice.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6217976E216F4F1400AC1756 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6217976F216F4F1400AC1756 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -105,6 +134,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6205C92D221BF20B00B576C2 /* Album */ = {
+			isa = PBXGroup;
+			children = (
+				6205C94F221C102A00B576C2 /* FXYImagePickerController.bundle */,
+				6205C92E221BF31A00B576C2 /* FXYImagePickerController.h */,
+				6205C92F221BF31A00B576C2 /* FXYImagePickerController.m */,
+				6205C931221BF53100B576C2 /* FXYImageManager.h */,
+				6205C932221BF53100B576C2 /* FXYImageManager.m */,
+				6205C934221BF55600B576C2 /* FXYAssetModel.h */,
+				6205C935221BF55600B576C2 /* FXYAssetModel.m */,
+				6205C93A221BF67200B576C2 /* FXYAlbumModel.h */,
+				6205C93B221BF67200B576C2 /* FXYAlbumModel.m */,
+				6205C93D221BFA7300B576C2 /* FXYImagePickerConfig.h */,
+				6205C93E221BFA7300B576C2 /* FXYImagePickerConfig.m */,
+				6205C940221BFAFE00B576C2 /* FXYPhotoPreviewView.h */,
+				6205C941221BFAFE00B576C2 /* FXYPhotoPreviewView.m */,
+				6205C943221BFBA100B576C2 /* FXYProgressView.h */,
+				6205C944221BFBA100B576C2 /* FXYProgressView.m */,
+				6205C949221BFEAD00B576C2 /* UIView+FXYLayout.h */,
+				6205C94A221BFEAD00B576C2 /* UIView+FXYLayout.m */,
+				6205C94C221C0F8F00B576C2 /* NSBundle+FXYImagePicker.h */,
+				6205C94D221C0F8F00B576C2 /* NSBundle+FXYImagePicker.m */,
+			);
+			path = Album;
+			sourceTree = "<group>";
+		};
 		62179762216F4F1400AC1756 = {
 			isa = PBXGroup;
 			children = (
@@ -225,6 +280,7 @@
 		62F808FA2216948B000EFA19 /* FXYCamera */ = {
 			isa = PBXGroup;
 			children = (
+				6205C92D221BF20B00B576C2 /* Album */,
 				62F808FB221694BB000EFA19 /* FXYCameraViewController.h */,
 				62F808FC221694BB000EFA19 /* FXYCameraViewController.m */,
 				62F808FE2216953B000EFA19 /* FXYCameraManager.h */,
@@ -316,6 +372,7 @@
 				624C01B4218199640085646B /* 209.mp3 in Resources */,
 				62179778216F4F1600AC1756 /* Assets.xcassets in Resources */,
 				62C7D3D52178616C00EAF19B /* 20180920094712.mp4 in Resources */,
+				6205C950221C102A00B576C2 /* FXYImagePickerController.bundle in Resources */,
 				6222519D218AD8DA0093ABA3 /* 202.mp3 in Resources */,
 				62179776216F4F1400AC1756 /* Main.storyboard in Resources */,
 			);
@@ -379,16 +436,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6205C94E221C0F8F00B576C2 /* NSBundle+FXYImagePicker.m in Sources */,
 				62F809002216953B000EFA19 /* FXYCameraManager.m in Sources */,
+				6205C930221BF31A00B576C2 /* FXYImagePickerController.m in Sources */,
 				6245A72F21707B4C0011AB4C /* OMCameraManager.m in Sources */,
+				6205C942221BFAFE00B576C2 /* FXYPhotoPreviewView.m in Sources */,
 				62F809032216BC8B000EFA19 /* FXYCircleProgressView.m in Sources */,
 				62EFCD8A217DBDE600B5D5DB /* OMVideoModel.m in Sources */,
 				62179773216F4F1400AC1756 /* ViewController.m in Sources */,
+				6205C945221BFBA100B576C2 /* FXYProgressView.m in Sources */,
+				6205C93C221BF67200B576C2 /* FXYAlbumModel.m in Sources */,
 				62EFCD86217DB6A800B5D5DB /* OMVideoListViewController.m in Sources */,
 				62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */,
 				62476CD52179D13800712B90 /* OMMovieWriter.m in Sources */,
 				62C7D3D8217868B600EAF19B /* OMVideoTool.m in Sources */,
+				6205C936221BF55600B576C2 /* FXYAssetModel.m in Sources */,
 				6217977E216F4F1600AC1756 /* main.m in Sources */,
+				6205C933221BF53100B576C2 /* FXYImageManager.m in Sources */,
 				62C2079A217987EF00D6A478 /* OMContextManager.m in Sources */,
 				6245A7322170935E0011AB4C /* OMCameraViewController.m in Sources */,
 				622DCCFF21747D750055F9C6 /* NSFileManager+Ext.m in Sources */,
@@ -396,10 +460,12 @@
 				62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */,
 				62C207972179851C00D6A478 /* OMPreviewView.m in Sources */,
 				62C2079D217989A000D6A478 /* OMPhotoFilters.m in Sources */,
+				6205C94B221BFEAD00B576C2 /* UIView+FXYLayout.m in Sources */,
 				62F808FD221694BB000EFA19 /* FXYCameraViewController.m in Sources */,
 				62179770216F4F1400AC1756 /* AppDelegate.m in Sources */,
 				6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */,
 				62C2079421797DBB00D6A478 /* OMFilterCameraViewController.m in Sources */,
+				6205C93F221BFA7300B576C2 /* FXYImagePickerConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
