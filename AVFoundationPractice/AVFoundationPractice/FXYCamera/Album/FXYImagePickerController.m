@@ -64,7 +64,7 @@
     // 默认的外观，你可以在这个方法后重置
     self.oKButtonTitleColorNormal   = [UIColor colorWithRed:(83/255.0) green:(179/255.0) blue:(17/255.0) alpha:1.0];
     self.oKButtonTitleColorDisabled = [UIColor colorWithRed:(83/255.0) green:(179/255.0) blue:(17/255.0) alpha:0.5];
-    self.navigationBar.barTintColor = [UIColor colorWithRed:(34/255.0) green:(34/255.0)  blue:(34/255.0) alpha:1.0];
+    self.navigationBar.barTintColor = [UIColor whiteColor];
     self.navigationBar.tintColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     if (self.needShowStatusBar) [UIApplication sharedApplication].statusBarHidden = NO;
@@ -87,8 +87,6 @@
 }
 
 - (instancetype)initWithMaxImagesCount:(NSInteger)maxImagesCount columnNumber:(NSInteger)columnNumber delegate:(id<FXYImagePickerControllerDelegate>)delegate {
-    
-    
     
     FXYPhotoPickerController *photoPickerVc = [[FXYPhotoPickerController alloc] init];
     photoPickerVc.isFirstAppear = YES;
@@ -118,6 +116,7 @@
         self.sortAscendingByModificationDate = YES;
         self.autoDismiss = YES;
         self.columnNumber = columnNumber;
+        //默认设置
         [self configDefaultSetting];
         
         if (![[FXYImageManager manager] authorizationStatusAuthorized]) {
@@ -317,7 +316,7 @@
     self.timeout = 15;
     self.photoWidth = 828.0;
     self.photoPreviewMaxWidth = 600;
-    self.naviTitleColor = [UIColor whiteColor];
+    self.naviTitleColor = [UIColor blackColor];
     self.naviTitleFont = [UIFont systemFontOfSize:17];
     self.allowPreview = YES;
     // 2.2.26版本，不主动缩放图片，降低内存占用

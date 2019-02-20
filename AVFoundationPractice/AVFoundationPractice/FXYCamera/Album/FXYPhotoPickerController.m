@@ -20,6 +20,7 @@
 #import "FXYVideoPlayerController.h"
 #import "FXYGifPhotoPreviewController.h"
 #import "FXYPhotoPreviewController.h"
+#import "UIImage+FXYBundle.h"
 @interface FXYPhotoPickerController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIAlertViewDelegate> {
     NSMutableArray *_models;//该相册的照片模型
     
@@ -66,6 +67,7 @@ static CGFloat itemMargin = 5;
 #warning 相册名字这里要用按钮，点击切换
     self.navigationItem.title = _model.name;//相册名字
 #warning 左边加一个叉叉的dismiss按钮
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[[UIImage fxy_imageNamedFromMyBundle:@"priceReduce_close"]imageWithRenderingMode: UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self.navigationController action:@selector(cancelButtonClick)];
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:tzImagePickerVc.cancelBtnTitleStr style:UIBarButtonItemStylePlain target:tzImagePickerVc action:@selector(cancelButtonClick)];
 //    if (tzImagePickerVc.navLeftBarButtonSettingBlock) {
 //        UIButton *leftButton = [UIButton buttonWithType:UIButtonTypeCustom];
