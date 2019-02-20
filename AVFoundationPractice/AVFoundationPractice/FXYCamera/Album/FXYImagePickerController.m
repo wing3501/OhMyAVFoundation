@@ -88,17 +88,21 @@
 
 - (instancetype)initWithMaxImagesCount:(NSInteger)maxImagesCount columnNumber:(NSInteger)columnNumber delegate:(id<FXYImagePickerControllerDelegate>)delegate {
     
-    FXYAlbumPickerView *albumPickerView = [[FXYAlbumPickerView alloc]initWithImagePickerController:self];
-    albumPickerView.isFirstAppear = YES;
-    albumPickerView.columnNumber = columnNumber;
-    _albumPickerView = albumPickerView;
+    
     
     FXYPhotoPickerController *photoPickerVc = [[FXYPhotoPickerController alloc] init];
     photoPickerVc.isFirstAppear = YES;
     photoPickerVc.columnNumber = columnNumber;
-    _photoPickerVc = photoPickerVc;
+    
     self = [super initWithRootViewController:photoPickerVc];
     if (self) {
+        _photoPickerVc = photoPickerVc;
+        
+        FXYAlbumPickerView *albumPickerView = [[FXYAlbumPickerView alloc]initWithImagePickerController:self];
+        albumPickerView.isFirstAppear = YES;
+        albumPickerView.columnNumber = columnNumber;
+        _albumPickerView = albumPickerView;
+        
         self.maxImagesCount = maxImagesCount > 0 ? maxImagesCount : 9; // Default is 9 / 默认最大可选9张图片
         self.pickerDelegate = delegate;
         self.selectedAssets = [NSMutableArray array];
