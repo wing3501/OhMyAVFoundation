@@ -19,11 +19,8 @@
 /// ===================== Appearance / 外观颜色 + 按钮文字 =====================
 @property (nonatomic, strong) UIColor *oKButtonTitleColorNormal;
 @property (nonatomic, strong) UIColor *oKButtonTitleColorDisabled;
-/// 导航栏颜色
 @property (nonatomic, strong) UIColor *naviBgColor;
-/// 导航栏标题颜色
 @property (nonatomic, strong) UIColor *naviTitleColor;
-/// 导航栏标题字体
 @property (nonatomic, strong) UIFont *naviTitleFont;
 
 @property (nonatomic, copy) NSString *doneBtnTitleStr;
@@ -32,7 +29,9 @@
 @property (nonatomic, copy) NSString *fullImageBtnTitleStr;
 @property (nonatomic, copy) NSString *settingBtnTitleStr;
 @property (nonatomic, copy) NSString *processHintStr;
-
+/// Icon theme color, default is green color like wechat, the value is r:31 g:185 b:34. Currently only support image selection icon when showSelectedIndex is YES. If you need it, please set it as soon as possible
+/// icon主题色，默认是微信的绿色，值是r:31 g:185 b:34。目前仅支持showSelectedIndex为YES时的图片选中icon。如需要，请尽早设置它。
+@property (nonatomic, strong) UIColor *iconThemeColor;
 /// ===================== 权限设置 =====================
 @property (nonatomic, assign) BOOL allowCrop;            ///< 允许裁剪,默认为YES，showSelectBtn为NO才生效
 /// Default is YES, if set NO, the original photo button will hide. user can't picking original photo.
@@ -94,9 +93,6 @@
 @property (nonatomic, assign) BOOL showPhotoCannotSelectLayer;
 /// Default is white color with 0.8 alpha;
 @property (nonatomic, strong) UIColor *cannotSelectLayerColor;
-/// Icon theme color, default is green color like wechat, the value is r:31 g:185 b:34. Currently only support image selection icon when showSelectedIndex is YES. If you need it, please set it as soon as possible
-/// icon主题色，默认是微信的绿色，值是r:31 g:185 b:34。目前仅支持showSelectedIndex为YES时的图片选中icon。如需要，请尽早设置它。
-@property (nonatomic, strong) UIColor *iconThemeColor;
 /// Default is NO, if set YES, in the delegate method the photos and infos will be nil, only assets hava value.
 /// 默认为NO，如果设置为YES，代理方法里photos和infos会是nil，只返回assets
 @property (assign, nonatomic) BOOL onlyReturnAsset;
