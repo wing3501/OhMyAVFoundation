@@ -1,0 +1,131 @@
+//
+//  FXYAlbumPickerView.m
+//  AVFoundationPractice
+//
+//  Created by 申屠云飞 on 2019/2/19.
+//  Copyright © 2019 styf. All rights reserved.
+//
+
+#import "FXYAlbumPickerView.h"
+#import "UIView+FXYLayout.h"
+#import "FXYImageManager.h"
+#import "FXYCommonTools.h"
+#import "FXYAlbumModel.h"
+#import "FXYAlbumCell.h"
+
+@interface FXYAlbumPickerView ()<UITableViewDataSource,UITableViewDelegate> {
+    UITableView *_tableView;
+}
+/// 相册数组
+@property (nonatomic, strong) NSMutableArray *albumArr;
+/// 控制器
+@property (nonatomic, weak) FXYImagePickerController *imagePickerController;
+@end
+
+@implementation FXYAlbumPickerView
+
+#pragma mark - life cycle
+
+- (instancetype)initWithImagePickerController:(FXYImagePickerController *)imagePickerController {
+    self = [super initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - [FXYCommonTools fxy_statusBarHeight] - 44)];
+    if (self) {
+        self.imagePickerController = imagePickerController;
+        [self commonInit];
+    }
+    return self;
+}
+/**
+ 初始化
+ */
+- (void)commonInit {
+    [self setupUI];
+    [self configTableView];
+}
+
+/**
+ 设置视图
+ */
+- (void)setupUI {
+    self.isFirstAppear = YES;
+    self.backgroundColor = [UIColor whiteColor];
+}
+
+#pragma mark - overwrite
+
+#pragma mark - public
+
+- (void)configTableView {
+    if (![[FXYImageManager manager] authorizationStatusAuthorized]) {
+        return;
+    }
+    
+    if (self.isFirstAppear) {
+        [self.imagePickerController showProgressHUD];
+    }
+    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        //获取到所有相册
+        [[FXYImageManager manager] getAllAlbums:self.imagePickerController.allowPickingVideo allowPickingImage:self.imagePickerController.allowPickingImage needFetchAssets:!self.isFirstAppear completion:^(NSArray<FXYAlbumModel *> *models) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self->_albumArr = [NSMutableArray arrayWithArray:models];
+                for (FXYAlbumModel *albumModel in self->_albumArr) {
+                    albumModel.selectedModels = self.imagePickerController.selectedModels;
+                }
+                [self.imagePickerController hideProgressHUD];
+                
+                if (self.isFirstAppear) {
+                    self.isFirstAppear = NO;
+                    [self configTableView];
+                }
+                
+                if (!self->_tableView) {
+                    self->_tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+                    self->_tableView.rowHeight = 70;
+                    self->_tableView.tableFooterView = [[UIView alloc] init];
+                    self->_tableView.dataSource = self;
+                    self->_tableView.delegate = self;
+                    [self->_tableView registerClass:[FXYAlbumCell class] forCellReuseIdentifier:@"FXYAlbumCell"];
+                    [self addSubview:self->_tableView];
+                } else {
+                    [self->_tableView reloadData];
+                }
+            });
+        }];
+    });
+}
+
+#pragma mark - notification
+
+#pragma mark - event response
+
+#pragma mark - private
+
+#pragma mark - getter and setter
+
+#pragma mark - Layout
+
+#pragma mark - UITableViewDataSource && Delegate
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return _albumArr.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    FXYAlbumCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FXYAlbumCell"];
+    cell.model = _albumArr[indexPath.row];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+#warning 收起相册页面，刷新图片页面
+    
+//    TZPhotoPickerController *photoPickerVc = [[TZPhotoPickerController alloc] init];
+//    photoPickerVc.columnNumber = self.columnNumber;
+//    TZAlbumModel *model = _albumArr[indexPath.row];
+//    photoPickerVc.model = model;
+//    [self.navigationController pushViewController:photoPickerVc animated:YES];
+//    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+}
+@end

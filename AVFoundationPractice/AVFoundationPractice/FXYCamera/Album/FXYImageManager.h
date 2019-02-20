@@ -21,7 +21,7 @@
 + (void)deallocManager;
 
 @property (weak, nonatomic) id<FXYImagePickerControllerDelegate> pickerDelegate;
-
+/// 是否需要修正图片方向
 @property (nonatomic, assign) BOOL shouldFixOrientation;
 
 /// Default is 600px / 默认600像素宽
