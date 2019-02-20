@@ -13,7 +13,8 @@
 #import "OMFilterCameraViewController.h"
 #import "OMVideoListViewController.h"
 #import "FXYCameraViewController.h"
-@interface ViewController ()
+#import "FXYImagePickerController.h"
+@interface ViewController ()<FXYImagePickerControllerDelegate>
 /// 列表
 @property (nonatomic,strong) NSArray *dataArray;
 @end
@@ -27,7 +28,8 @@
                    @{@"name":@"视频读写",@"method":@"videoWriteViewController"},
                    @{@"name":@"滤镜相机(打开VideoDataOutputON)",@"method":@"filterCameraViewController"},
                    @{@"name":@"视频编辑",@"method":@"videoListViewController"},
-                   @{@"name":@"仿闲鱼相机",@"method":@"fxyCameraViewController"}
+                   @{@"name":@"仿闲鱼相机",@"method":@"fxyCameraViewController"},
+                   @{@"name":@"仿闲鱼图片选择器",@"method":@"fxyImagePickerController"}
                    ];
 }
 
@@ -75,5 +77,26 @@
 - (void)fxyCameraViewController {
     FXYCameraViewController *vc = [[FXYCameraViewController alloc]init];
     [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)fxyImagePickerController {
+    FXYImagePickerController *imagePickerVc = [[FXYImagePickerController alloc]initWithMaxImagesCount:5 delegate:self];
+    imagePickerVc.allowTakePicture = YES;
+    imagePickerVc.showPhotoCannotSelectLayer = YES;
+    imagePickerVc.cannotSelectLayerColor = [[UIColor whiteColor] colorWithAlphaComponent:0.8];
+    imagePickerVc.allowPickingVideo = YES;
+    imagePickerVc.allowPickingImage = YES;
+    imagePickerVc.allowPickingOriginalPhoto = YES;
+    imagePickerVc.allowPickingGif = NO;
+    imagePickerVc.allowPickingMultipleVideo = NO;
+    imagePickerVc.sortAscendingByModificationDate = YES;
+    imagePickerVc.showSelectedIndex = YES;
+    // You can get the photos by block, the same as by delegate.
+    // 你可以通过block或者代理，来得到用户选择的照片.
+    [imagePickerVc setDidFinishPickingPhotosHandle:^(NSArray<UIImage *> *photos, NSArray *assets, BOOL isSelectOriginalPhoto) {
+        
+    }];
+    
+    [self presentViewController:imagePickerVc animated:YES completion:nil];
 }
 @end

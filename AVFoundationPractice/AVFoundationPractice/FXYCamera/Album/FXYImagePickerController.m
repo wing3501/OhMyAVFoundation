@@ -95,7 +95,7 @@
     
     FXYPhotoPickerController *photoPickerVc = [[FXYPhotoPickerController alloc] init];
     photoPickerVc.isFirstAppear = YES;
-    photoPickerVc.columnNumber = self.columnNumber;
+    photoPickerVc.columnNumber = columnNumber;
     _photoPickerVc = photoPickerVc;
     self = [super initWithRootViewController:photoPickerVc];
     if (self) {
@@ -570,11 +570,17 @@
 }
 
 - (void)setAllowPickingImage:(BOOL)allowPickingImage {
+#warning 不能点击拍照
     _allowPickingImage = allowPickingImage;
     [FXYImagePickerConfig sharedInstance].allowPickingImage = allowPickingImage;
     if (!allowPickingImage) {
         _allowTakePicture = NO;
     }
+}
+
+- (void)setAllowTakeVideo:(BOOL)allowTakeVideo {
+    _allowTakeVideo = allowTakeVideo;
+#warning 不能点击拍视频
 }
 
 - (void)setAllowPickingVideo:(BOOL)allowPickingVideo {
