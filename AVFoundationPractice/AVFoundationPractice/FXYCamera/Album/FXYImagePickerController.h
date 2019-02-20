@@ -110,6 +110,14 @@
 /// Hide the photo what can not be selected, Default is NO
 /// 隐藏不可以选中的图片，默认是NO，不推荐将其设置为YES
 @property (nonatomic, assign) BOOL hideWhenCanNotSelect;
+/// 首选语言，如果设置了就用该语言，不设则取当前系统语言。
+/// 由于目前只支持中文、繁体中文、英文、越南语。故该属性只支持zh-Hans、zh-Hant、en、vi四种值，其余值无效。
+@property (nonatomic, copy) NSString *preferredLanguage;
+
+/// 语言bundle，preferredLanguage变化时languageBundle会变化
+/// 可通过手动设置bundle，让选择器支持新的的语言（需要在设置preferredLanguage后设置languageBundle）。欢迎提交PR把语言文件提交上来~
+@property (nonatomic, strong) NSBundle *languageBundle;
+
 /// ===================== 按钮图片相关 =====================
 @property (nonatomic, copy) NSString *takePictureImageName __attribute__((deprecated("Use -takePictureImage.")));
 @property (nonatomic, copy) NSString *photoSelImageName __attribute__((deprecated("Use -photoSelImage.")));
@@ -187,7 +195,7 @@
 // photos数组里的UIImage对象，默认是828像素宽，你可以通过设置photoWidth属性的值来改变它
 - (void)imagePickerController:(FXYImagePickerController *)picker didFinishPickingPhotos:(NSArray<UIImage *> *)photos sourceAssets:(NSArray *)assets isSelectOriginalPhoto:(BOOL)isSelectOriginalPhoto;
 - (void)imagePickerController:(FXYImagePickerController *)picker didFinishPickingPhotos:(NSArray<UIImage *> *)photos sourceAssets:(NSArray *)assets isSelectOriginalPhoto:(BOOL)isSelectOriginalPhoto infos:(NSArray<NSDictionary *> *)infos;
-- (void)tz_imagePickerControllerDidCancel:(FXYImagePickerController *)picker;
+- (void)fxy_imagePickerControllerDidCancel:(FXYImagePickerController *)picker;
 
 // If user picking a video and allowPickingMultipleVideo is NO, this callback will be called.
 // If allowPickingMultipleVideo is YES, will call imagePickerController:didFinishPickingPhotos:sourceAssets:isSelectOriginalPhoto:

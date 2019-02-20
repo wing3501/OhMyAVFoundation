@@ -283,6 +283,13 @@
         [self callDelegateMethod];
     }
 }
+
+/**
+ 设置按钮点击
+ */
+- (void)settingBtnClick {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+}
 #pragma mark - private
 
 /**
@@ -372,8 +379,8 @@
 }
 
 - (void)callDelegateMethod {
-    if ([self.pickerDelegate respondsToSelector:@selector(tz_imagePickerControllerDidCancel:)]) {
-        [self.pickerDelegate tz_imagePickerControllerDidCancel:self];
+    if ([self.pickerDelegate respondsToSelector:@selector(fxy_imagePickerControllerDidCancel:)]) {
+        [self.pickerDelegate fxy_imagePickerControllerDidCancel:self];
     }
     if (self.imagePickerControllerDidCancelHandle) {
         self.imagePickerControllerDidCancelHandle();
@@ -560,6 +567,39 @@
         model.isSelected = YES;
         [self addSelectedModel:model];
     }
+}
+
+- (void)setAllowPickingImage:(BOOL)allowPickingImage {
+    _allowPickingImage = allowPickingImage;
+    [FXYImagePickerConfig sharedInstance].allowPickingImage = allowPickingImage;
+    if (!allowPickingImage) {
+        _allowTakePicture = NO;
+    }
+}
+
+- (void)setAllowPickingVideo:(BOOL)allowPickingVideo {
+    _allowPickingVideo = allowPickingVideo;
+    [FXYImagePickerConfig sharedInstance].allowPickingVideo = allowPickingVideo;
+    if (!allowPickingVideo) {
+        _allowTakeVideo = NO;
+    }
+}
+
+- (void)setPreferredLanguage:(NSString *)preferredLanguage {
+    _preferredLanguage = preferredLanguage;
+    [FXYImagePickerConfig sharedInstance].preferredLanguage = preferredLanguage;
+    [self configDefaultBtnTitle];
+}
+
+- (void)setLanguageBundle:(NSBundle *)languageBundle {
+    _languageBundle = languageBundle;
+    [FXYImagePickerConfig sharedInstance].languageBundle = languageBundle;
+    [self configDefaultBtnTitle];
+}
+
+- (void)setSortAscendingByModificationDate:(BOOL)sortAscendingByModificationDate {
+    _sortAscendingByModificationDate = sortAscendingByModificationDate;
+    [FXYImageManager manager].sortAscendingByModificationDate = sortAscendingByModificationDate;
 }
 #pragma clang diagnostic pop
 
