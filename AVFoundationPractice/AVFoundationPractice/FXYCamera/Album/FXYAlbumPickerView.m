@@ -27,7 +27,8 @@
 #pragma mark - life cycle
 
 - (instancetype)initWithImagePickerController:(FXYImagePickerController *)imagePickerController {
-    self = [super initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - [FXYCommonTools fxy_statusBarHeight] - 44)];
+    CGFloat navigationBarHeight = [FXYCommonTools fxy_statusBarHeight] + 44;
+    self = [super initWithFrame:CGRectMake(0, navigationBarHeight, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - navigationBarHeight)];
     if (self) {
         self.imagePickerController = imagePickerController;
         [self commonInit];
@@ -52,6 +53,9 @@
 
 #pragma mark - overwrite
 
+- (void)didMoveToSuperview {
+    [self showAnimation:self.superview != nil];
+}
 #pragma mark - public
 
 - (void)configTableView {
@@ -79,7 +83,7 @@
                 }
                 
                 if (!self->_tableView) {
-                    self->_tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+                    self->_tableView = [[UITableView alloc] initWithFrame:self.bounds style:UITableViewStylePlain];
                     self->_tableView.rowHeight = 70;
                     self->_tableView.tableFooterView = [[UIView alloc] init];
                     self->_tableView.dataSource = self;
@@ -99,6 +103,20 @@
 #pragma mark - event response
 
 #pragma mark - private
+
+/**
+ 显示和收起的动画
+
+ @param show 是否显示
+ */
+- (void)showAnimation:(BOOL)show {
+    CGFloat fromHeight = show ? 0 : self.bounds.size.height;
+    CGFloat toHeight = show ? self.bounds.size.height : 0;
+    self.fxy_height = fromHeight;
+    [UIView animateWithDuration:4 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.fxy_height = toHeight;
+    } completion:nil];
+}
 
 #pragma mark - getter and setter
 

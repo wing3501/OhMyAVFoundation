@@ -41,10 +41,12 @@
 @property (nonatomic, assign) BOOL isSelectOriginalPhoto;
 @property (nonatomic, strong) FXYCollectionView *collectionView;
 @property (nonatomic, strong) UILabel *noDataLabel;
-@property (strong, nonatomic) UICollectionViewFlowLayout *layout;
+@property (nonatomic, strong) UICollectionViewFlowLayout *layout;
 @property (nonatomic, strong) UIImagePickerController *imagePickerVc;
-@property (strong, nonatomic) CLLocation *location;
+@property (nonatomic, strong) CLLocation *location;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
+/// 标题按钮
+@property (nonatomic, strong) UIButton *titleButton;
 @end
 
 static CGSize AssetGridThumbnailSize;
@@ -63,9 +65,11 @@ static CGFloat itemMargin = 5;
     FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
     _isSelectOriginalPhoto = tzImagePickerVc.isSelectOriginalPhoto;
     _shouldScrollToBottom = YES;
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor yellowColor];
 #warning 相册名字这里要用按钮，点击切换
-    self.navigationItem.title = _model.name;//相册名字
+//    self.navigationItem.title = _model.name;//相册名字
+    [self.titleButton setTitle:_model.name forState:UIControlStateNormal];
+    self.navigationItem.titleView = self.titleButton;
 #warning 左边加一个叉叉的dismiss按钮
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[[UIImage fxy_imageNamedFromMyBundle:@"priceReduce_close"]imageWithRenderingMode: UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self.navigationController action:@selector(cancelButtonClick)];
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:tzImagePickerVc.cancelBtnTitleStr style:UIBarButtonItemStylePlain target:tzImagePickerVc action:@selector(cancelButtonClick)];
@@ -329,6 +333,14 @@ static CGFloat itemMargin = 5;
     if (tzImagePickerVc.selectedModels.count <= 0 || tzImagePickerVc.onlyReturnAsset) {
         [self didGetAllPhotos:photos assets:assets infoArr:infoArr];
     }
+}
+
+/**
+ 点击标题
+ */
+- (void)titleClick:(UIButton *)button {
+    button.selected = !button.selected;
+    !_titleClickBlock ?: _titleClickBlock(button.selected);
 }
 #pragma mark - private
 
@@ -725,6 +737,18 @@ static CGFloat itemMargin = 5;
 - (void)setModel:(FXYAlbumModel *)model {
     _model = model;
 #warning 设置数据
+}
+
+- (UIButton *)titleButton {
+    if (!_titleButton) {
+        FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
+        _titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_titleButton setTitleColor:tzImagePickerVc.naviTitleColor forState:UIControlStateNormal];
+        _titleButton.titleLabel.font = tzImagePickerVc.naviTitleFont;
+        [_titleButton setBackgroundColor:[UIColor redColor]];
+        [_titleButton addTarget:self action:@selector(titleClick:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _titleButton;
 }
 
 //- (UIImagePickerController *)imagePickerVc {

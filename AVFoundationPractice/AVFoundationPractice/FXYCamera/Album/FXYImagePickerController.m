@@ -91,7 +91,11 @@
     FXYPhotoPickerController *photoPickerVc = [[FXYPhotoPickerController alloc] init];
     photoPickerVc.isFirstAppear = YES;
     photoPickerVc.columnNumber = columnNumber;
-    
+    __weak typeof(self) weakSelf = self;
+    photoPickerVc.titleClickBlock = ^(BOOL buttonSelected) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf showAlbumPickerView:buttonSelected];
+    };
     self = [super initWithRootViewController:photoPickerVc];
     if (self) {
         _photoPickerVc = photoPickerVc;
@@ -387,6 +391,17 @@
     }
     if (self.imagePickerControllerDidCancelHandle) {
         self.imagePickerControllerDidCancelHandle();
+    }
+}
+
+/**
+ 显示\隐藏相册选择视图
+ */
+- (void)showAlbumPickerView:(BOOL)show {
+    if (show) {
+        [self.view addSubview:self.albumPickerView];
+    }else{
+        [self.albumPickerView removeFromSuperview];
     }
 }
 #pragma mark - getter and setter
