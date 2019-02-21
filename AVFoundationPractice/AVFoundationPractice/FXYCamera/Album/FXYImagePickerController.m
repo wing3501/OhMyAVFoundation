@@ -15,8 +15,8 @@
 #import "NSBundle+FXYImagePicker.h"
 #import "FXYImageManager.h"
 #import "UIImage+FXYBundle.h"
-
-@interface FXYImagePickerController (){
+#import "FXYPushAnimator.h"
+@interface FXYImagePickerController ()<UINavigationControllerDelegate>{
     NSTimer *_timer;
     UILabel *_tipLabel;
     UIButton *_settingBtn;
@@ -42,6 +42,8 @@
 @property (nonatomic, strong) UIButton *albumButton;
 /// 拍照按钮
 @property (nonatomic, strong) UIButton *takePhotoButton;
+/// 转场动画
+@property (nonatomic, strong) FXYPushAnimator *pushAnimator;
 @end
 
 @implementation FXYImagePickerController
@@ -65,6 +67,7 @@
 //    self.navigationBar.barStyle = UIBarStyleBlack;
 //    self.navigationBar.translucent = YES;
     [self setNavigationBarHidden:YES];
+    self.delegate = self;
     [FXYImageManager manager].shouldFixOrientation = NO;
     
     // Default appearance, you can reset these after this method
@@ -429,7 +432,25 @@
         [self.albumPickerView close];
     }
 }
+
+#pragma mark - UINavigationControllerDelegate
+
+- (nullable id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
+                                            animationControllerForOperation:(UINavigationControllerOperation)operation
+                                                         fromViewController:(UIViewController *)fromVC
+                                                           toViewController:(UIViewController *)toVC {
+    self.pushAnimator.operation = operation;
+    return self.pushAnimator;
+}
+
 #pragma mark - getter and setter
+
+- (FXYPushAnimator *)pushAnimator {
+    if (!_pushAnimator) {
+        _pushAnimator = [[FXYPushAnimator alloc]init];
+    }
+    return _pushAnimator;
+}
 
 - (UIView *)bottomToolBar {
     if (!_bottomToolBar) {

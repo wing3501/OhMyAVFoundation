@@ -21,6 +21,7 @@
 #import "FXYGifPhotoPreviewController.h"
 #import "FXYPhotoPreviewController.h"
 #import "UIImage+FXYBundle.h"
+#import "MyViewController.h"
 @interface FXYPhotoPickerController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIAlertViewDelegate> {
     NSMutableArray *_models;//该相册的照片模型
     
