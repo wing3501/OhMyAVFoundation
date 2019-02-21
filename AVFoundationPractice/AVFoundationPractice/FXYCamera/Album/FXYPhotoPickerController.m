@@ -21,7 +21,7 @@
 #import "FXYGifPhotoPreviewController.h"
 #import "FXYPhotoPreviewController.h"
 #import "UIImage+FXYBundle.h"
-#import "MyViewController.h"
+
 @interface FXYPhotoPickerController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIAlertViewDelegate> {
     NSMutableArray *_models;//该相册的照片模型
     
@@ -99,6 +99,7 @@ static CGFloat itemMargin = 5;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES];
     // Determine the size of the thumbnails to request from the PHCachingImageManager
     CGFloat scale = 2.0;
     if ([UIScreen mainScreen].bounds.size.width > 600) {

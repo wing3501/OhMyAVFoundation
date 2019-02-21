@@ -47,7 +47,6 @@
 		624C01B4218199640085646B /* 209.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 624C01B3218199640085646B /* 209.mp3 */; };
 		6269AB6321743DC300780156 /* OMCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6269AB6221743DC300780156 /* OMCircleProgressView.m */; };
 		62795B042175C7BA004329E4 /* OMAssetsLibraryTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */; };
-		628D2961221E99D600C5D4AF /* MyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 628D2960221E99D600C5D4AF /* MyViewController.m */; };
 		628D2964221EA7E500C5D4AF /* FXYPushAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 628D2963221EA7E500C5D4AF /* FXYPushAnimator.m */; };
 		62C2079421797DBB00D6A478 /* OMFilterCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C2079321797DBB00D6A478 /* OMFilterCameraViewController.m */; };
 		62C207972179851C00D6A478 /* OMPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 62C207962179851C00D6A478 /* OMPreviewView.m */; };
@@ -140,8 +139,6 @@
 		6269AB6221743DC300780156 /* OMCircleProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMCircleProgressView.m; sourceTree = "<group>"; };
 		62795B022175C7BA004329E4 /* OMAssetsLibraryTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMAssetsLibraryTool.h; sourceTree = "<group>"; };
 		62795B032175C7BA004329E4 /* OMAssetsLibraryTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMAssetsLibraryTool.m; sourceTree = "<group>"; };
-		628D295F221E99D600C5D4AF /* MyViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyViewController.h; sourceTree = "<group>"; };
-		628D2960221E99D600C5D4AF /* MyViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyViewController.m; sourceTree = "<group>"; };
 		628D2962221EA7E500C5D4AF /* FXYPushAnimator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXYPushAnimator.h; sourceTree = "<group>"; };
 		628D2963221EA7E500C5D4AF /* FXYPushAnimator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FXYPushAnimator.m; sourceTree = "<group>"; };
 		62C2079221797DBB00D6A478 /* OMFilterCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OMFilterCameraViewController.h; sourceTree = "<group>"; };
@@ -252,8 +249,6 @@
 				6217976F216F4F1400AC1756 /* AppDelegate.m */,
 				62179771216F4F1400AC1756 /* ViewController.h */,
 				62179772216F4F1400AC1756 /* ViewController.m */,
-				628D295F221E99D600C5D4AF /* MyViewController.h */,
-				628D2960221E99D600C5D4AF /* MyViewController.m */,
 				62F808FA2216948B000EFA19 /* FXYCamera */,
 				62C7D3D32178610200EAF19B /* Resources */,
 				6245A72C21707AC60011AB4C /* OMCamera */,
@@ -570,7 +565,6 @@
 				62F2DF832177530E003C0D2D /* AVCaptureDevice+Ext.m in Sources */,
 				62333FD6221D33A500C29500 /* FXYAssetPreviewCell.m in Sources */,
 				62333FBD221CEB5000C29500 /* FXYAlbumCell.m in Sources */,
-				628D2961221E99D600C5D4AF /* MyViewController.m in Sources */,
 				62333FC0221CFB2A00C29500 /* FXYPhotoPickerController.m in Sources */,
 				62C207972179851C00D6A478 /* OMPreviewView.m in Sources */,
 				62C2079D217989A000D6A478 /* OMPhotoFilters.m in Sources */,
