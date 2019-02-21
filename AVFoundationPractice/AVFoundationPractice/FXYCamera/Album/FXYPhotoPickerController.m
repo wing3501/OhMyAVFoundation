@@ -124,7 +124,7 @@ static CGFloat itemMargin = 5;
         [self configCollectionView];
         self->_collectionView.hidden = YES;
         [self configBottomToolBar];
-        
+        [self->_collectionView reloadData];
         [self scrollCollectionViewToBottom];
     });
 }
@@ -365,26 +365,28 @@ static CGFloat itemMargin = 5;
  设置列表
  */
 - (void)configCollectionView {
-    _layout = [[UICollectionViewFlowLayout alloc] init];
-    _collectionView = [[FXYCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:_layout];
-    _collectionView.backgroundColor = [UIColor whiteColor];
-    _collectionView.dataSource = self;
-    _collectionView.delegate = self;
-    _collectionView.alwaysBounceHorizontal = NO;
-    _collectionView.contentInset = UIEdgeInsetsMake(itemMargin, itemMargin, itemMargin, itemMargin);
-    
-    _collectionView.contentSize = CGSizeMake(self.view.fxy_width, ((_model.count + self.columnNumber - 1) / self.columnNumber) * self.view.fxy_width);
-    if (_models.count == 0) {
-        _noDataLabel = [UILabel new];
-        _noDataLabel.textAlignment = NSTextAlignmentCenter;
-        _noDataLabel.text = [NSBundle fxy_localizedStringForKey:@"No Photos or Videos"];
-        CGFloat rgb = 153 / 256.0;
-        _noDataLabel.textColor = [UIColor colorWithRed:rgb green:rgb blue:rgb alpha:1.0];
-        _noDataLabel.font = [UIFont boldSystemFontOfSize:20];
-        [_collectionView addSubview:_noDataLabel];
+    if (!_collectionView) {
+        _layout = [[UICollectionViewFlowLayout alloc] init];
+        _collectionView = [[FXYCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:_layout];
+        _collectionView.backgroundColor = [UIColor whiteColor];
+        _collectionView.dataSource = self;
+        _collectionView.delegate = self;
+        _collectionView.alwaysBounceHorizontal = NO;
+        _collectionView.contentInset = UIEdgeInsetsMake(itemMargin, itemMargin, itemMargin, itemMargin);
+        
+        _collectionView.contentSize = CGSizeMake(self.view.fxy_width, ((_model.count + self.columnNumber - 1) / self.columnNumber) * self.view.fxy_width);
+        if (_models.count == 0) {
+            _noDataLabel = [UILabel new];
+            _noDataLabel.textAlignment = NSTextAlignmentCenter;
+            _noDataLabel.text = [NSBundle fxy_localizedStringForKey:@"No Photos or Videos"];
+            CGFloat rgb = 153 / 256.0;
+            _noDataLabel.textColor = [UIColor colorWithRed:rgb green:rgb blue:rgb alpha:1.0];
+            _noDataLabel.font = [UIFont boldSystemFontOfSize:20];
+            [_collectionView addSubview:_noDataLabel];
+        }
+        [self.view addSubview:_collectionView];
+        [_collectionView registerClass:[FXYAssetCell class] forCellWithReuseIdentifier:@"FXYAssetCell"];
     }
-    [self.view addSubview:_collectionView];
-    [_collectionView registerClass:[FXYAssetCell class] forCellWithReuseIdentifier:@"FXYAssetCell"];
 }
 
 /**
@@ -737,6 +739,7 @@ static CGFloat itemMargin = 5;
 - (void)setModel:(FXYAlbumModel *)model {
     _model = model;
     [self.titleButton setTitle:model.name forState:UIControlStateNormal];
+    [self fetchAssetModels];
 #warning 设置数据
 }
 

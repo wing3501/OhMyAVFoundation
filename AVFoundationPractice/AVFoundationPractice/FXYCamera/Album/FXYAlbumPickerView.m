@@ -104,6 +104,11 @@
     });
 }
 
+- (void)showInView:(UIView *)view {
+    [view addSubview:self];
+    [self showAnimation:YES];
+}
+
 - (void)close {
     [self showAnimation:NO];
 }
@@ -124,7 +129,7 @@
     CGFloat fromHeight = show ? 0 : height;
     CGFloat toHeight = show ? height : 0;
     self.fxy_height = fromHeight;
-    [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
         self.fxy_height = toHeight;
     } completion:^(BOOL finished) {
         show ?: [self removeFromSuperview];

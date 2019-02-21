@@ -21,6 +21,7 @@
  */
 - (void)configTableView;
 
+- (void)showInView:(UIView *)view;
 - (void)close;
 @end
 

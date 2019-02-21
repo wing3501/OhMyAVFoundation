@@ -399,7 +399,7 @@
  */
 - (void)showAlbumPickerView:(BOOL)show {
     if (show) {
-        [self.view addSubview:self.albumPickerView];
+        [self.albumPickerView showInView:self.view];
     }else{
         [self.albumPickerView close];
     }
