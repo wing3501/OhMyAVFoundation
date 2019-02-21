@@ -672,7 +672,7 @@ static CGFloat itemMargin = 5;
                 model.isSelected = YES;
                 [tzImagePickerVc addSelectedModel:model];
                 if (tzImagePickerVc.showSelectedIndex || tzImagePickerVc.showPhotoCannotSelectLayer) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"TZ_PHOTO_PICKER_RELOAD_NOTIFICATION" object:strongSelf.navigationController];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"FXY_PHOTO_PICKER_RELOAD_NOTIFICATION" object:strongSelf.navigationController];
                 }
                 [strongSelf refreshBottomToolBarStatus];
                 [UIView showOscillatoryAnimationWithLayer:strongLayer type:FXYOscillatoryAnimationToSmaller];
