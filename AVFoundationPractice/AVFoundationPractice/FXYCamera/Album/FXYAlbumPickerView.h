@@ -21,5 +21,6 @@
  */
 - (void)configTableView;
 
+- (void)close;
 @end
 

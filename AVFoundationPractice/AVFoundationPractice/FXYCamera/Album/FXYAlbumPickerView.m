@@ -49,13 +49,17 @@
 - (void)setupUI {
     self.isFirstAppear = YES;
     self.backgroundColor = [UIColor whiteColor];
+    self.clipsToBounds = YES;
 }
 
 #pragma mark - overwrite
 
-- (void)didMoveToSuperview {
-    [self showAnimation:self.superview != nil];
+- (void)willMoveToSuperview:(UIView *)newSuperview {
+    if (newSuperview) {
+        [self showAnimation:YES];
+    }
 }
+
 #pragma mark - public
 
 - (void)configTableView {
@@ -88,6 +92,7 @@
                     self->_tableView.tableFooterView = [[UIView alloc] init];
                     self->_tableView.dataSource = self;
                     self->_tableView.delegate = self;
+                    self->_tableView.backgroundColor = [UIColor blueColor];
                     [self->_tableView registerClass:[FXYAlbumCell class] forCellReuseIdentifier:@"FXYAlbumCell"];
                     [self addSubview:self->_tableView];
                 } else {
@@ -98,6 +103,9 @@
     });
 }
 
+- (void)close {
+    [self showAnimation:NO];
+}
 #pragma mark - notification
 
 #pragma mark - event response
@@ -110,12 +118,16 @@
  @param show 是否显示
  */
 - (void)showAnimation:(BOOL)show {
-    CGFloat fromHeight = show ? 0 : self.bounds.size.height;
-    CGFloat toHeight = show ? self.bounds.size.height : 0;
+    CGFloat navigationBarHeight = [FXYCommonTools fxy_statusBarHeight] + 44;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height - navigationBarHeight;
+    CGFloat fromHeight = show ? 0 : height;
+    CGFloat toHeight = show ? height : 0;
     self.fxy_height = fromHeight;
-    [UIView animateWithDuration:4 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.fxy_height = toHeight;
-    } completion:nil];
+    } completion:^(BOOL finished) {
+        show ?: [self removeFromSuperview];
+    }];
 }
 
 #pragma mark - getter and setter
@@ -136,7 +148,6 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
 #warning 收起相册页面，刷新图片页面
     
 //    TZPhotoPickerController *photoPickerVc = [[TZPhotoPickerController alloc] init];

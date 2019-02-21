@@ -401,7 +401,7 @@
     if (show) {
         [self.view addSubview:self.albumPickerView];
     }else{
-        [self.albumPickerView removeFromSuperview];
+        [self.albumPickerView close];
     }
 }
 #pragma mark - getter and setter
