@@ -16,6 +16,7 @@
 #import "FXYImageManager.h"
 #import "UIImage+FXYBundle.h"
 #import "FXYPushAnimator.h"
+#import "FXYCameraViewController.h"
 @interface FXYImagePickerController ()<UINavigationControllerDelegate>{
     NSTimer *_timer;
     UILabel *_tipLabel;
@@ -316,14 +317,19 @@
  相册按钮点击
  */
 - (void)albumButtonClick {
-    
+    if (self.viewControllers.count > 1) {
+        [self popViewControllerAnimated:YES];
+    }
 }
 
 /**
  拍照按钮点击
  */
 - (void)takePhotoButtonClick {
-    
+    if (self.viewControllers.count == 1) {
+        FXYCameraViewController *vc = [[FXYCameraViewController alloc]init];
+        [self pushViewController:vc animated:YES];
+    }
 }
 #pragma mark - private
 
