@@ -24,7 +24,6 @@
 @interface FXYPhotoPickerController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIAlertViewDelegate> {
     NSMutableArray *_models;//该相册的照片模型
     
-    UIView *_bottomToolBar;
     UIButton *_previewButton;
     UIButton *_doneButton;
     UIImageView *_numberImageView;
@@ -45,8 +44,14 @@
 @property (nonatomic, strong) UIImagePickerController *imagePickerVc;
 @property (nonatomic, strong) CLLocation *location;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
+/// 自定义导航栏
+@property (nonatomic, strong) UIView *customNavigationBar;
 /// 标题按钮
 @property (nonatomic, strong) UIButton *titleButton;
+/// 关闭按钮
+@property (nonatomic, strong) UIButton *closeButton;
+/// 底部工具条
+@property (nonatomic, strong) UIView *bottomToolBar;
 @end
 
 static CGSize AssetGridThumbnailSize;
@@ -65,13 +70,15 @@ static CGFloat itemMargin = 5;
     FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
     _isSelectOriginalPhoto = tzImagePickerVc.isSelectOriginalPhoto;
     _shouldScrollToBottom = YES;
-    self.view.backgroundColor = [UIColor yellowColor];
+    self.view.backgroundColor = [UIColor whiteColor];
 #warning 相册名字这里要用按钮，点击切换
 //    self.navigationItem.title = _model.name;//相册名字
-    [self.titleButton setTitle:_model.name forState:UIControlStateNormal];
-    self.navigationItem.titleView = self.titleButton;
+//    [self.titleButton setTitle:_model.name forState:UIControlStateNormal];
+//    self.navigationItem.titleView = self.titleButton;
 #warning 左边加一个叉叉的dismiss按钮
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[[UIImage fxy_imageNamedFromMyBundle:@"priceReduce_close"]imageWithRenderingMode: UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self.navigationController action:@selector(cancelButtonClick)];
+//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[[UIImage fxy_imageNamedFromMyBundle:@"priceReduce_close"]imageWithRenderingMode: UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self.navigationController action:@selector(cancelButtonClick)];
+    
+    
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:tzImagePickerVc.cancelBtnTitleStr style:UIBarButtonItemStylePlain target:tzImagePickerVc action:@selector(cancelButtonClick)];
 //    if (tzImagePickerVc.navLeftBarButtonSettingBlock) {
 //        UIButton *leftButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -121,6 +128,7 @@ static CGFloat itemMargin = 5;
         [tzImagePickerVc hideProgressHUD];
         
         [self checkSelectedModels];
+        [self configNavigationBar];
         [self configCollectionView];
         self->_collectionView.hidden = YES;
         [self configBottomToolBar];
@@ -362,13 +370,23 @@ static CGFloat itemMargin = 5;
 }
 
 /**
+ 设置导航栏
+ */
+- (void)configNavigationBar {
+    [self.view addSubview:self.customNavigationBar];
+    [self.customNavigationBar addSubview:self.titleButton];
+    self.titleButton.center = CGPointMake(self.customNavigationBar.fxy_width * 0.5, self.customNavigationBar.fxy_height * 0.5);
+    [self.customNavigationBar addSubview:self.closeButton];
+}
+
+/**
  设置列表
  */
 - (void)configCollectionView {
     if (!_collectionView) {
         _layout = [[UICollectionViewFlowLayout alloc] init];
         _collectionView = [[FXYCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:_layout];
-        _collectionView.backgroundColor = [UIColor whiteColor];
+        _collectionView.backgroundColor = [UIColor lightGrayColor];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
         _collectionView.alwaysBounceHorizontal = NO;
@@ -396,9 +414,6 @@ static CGFloat itemMargin = 5;
     FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
     if (!tzImagePickerVc.showSelectBtn) return;
     
-    _bottomToolBar = [[UIView alloc] initWithFrame:CGRectZero];
-    CGFloat rgb = 253 / 255.0;
-    _bottomToolBar.backgroundColor = [UIColor colorWithRed:rgb green:rgb blue:rgb alpha:1.0];
     
 #warning 底部条的效果待定，切换拍照等+选中的图片
     
@@ -467,7 +482,7 @@ static CGFloat itemMargin = 5;
 //    [_bottomToolBar addSubview:_numberImageView];
 //    [_bottomToolBar addSubview:_numberLabel];
 //    [_bottomToolBar addSubview:_originalPhotoButton];
-//    [self.view addSubview:_bottomToolBar];
+//    [self.view addSubview:self.bottomToolBar];
 //    [_originalPhotoButton addSubview:_originalPhotoLabel];
 }
 
@@ -738,7 +753,9 @@ static CGFloat itemMargin = 5;
 
 - (void)setModel:(FXYAlbumModel *)model {
     _model = model;
+    self.titleButton.selected = NO;
     [self.titleButton setTitle:model.name forState:UIControlStateNormal];
+    _shouldScrollToBottom = YES;
     [self fetchAssetModels];
 #warning 设置数据
 }
@@ -749,10 +766,38 @@ static CGFloat itemMargin = 5;
         _titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_titleButton setTitleColor:tzImagePickerVc.naviTitleColor forState:UIControlStateNormal];
         _titleButton.titleLabel.font = tzImagePickerVc.naviTitleFont;
+        _titleButton.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * 2 / 3, 35);
         [_titleButton setBackgroundColor:[UIColor redColor]];
         [_titleButton addTarget:self action:@selector(titleClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _titleButton;
+}
+
+- (UIView *)bottomToolBar {
+    if (!_bottomToolBar) {
+        _bottomToolBar = [[UIView alloc]init];
+        CGFloat rgb = 253 / 255.0;
+        _bottomToolBar.backgroundColor = [UIColor colorWithRed:rgb green:rgb blue:rgb alpha:1.0];
+    }
+    return _bottomToolBar;
+}
+
+- (UIView *)customNavigationBar {
+    if (!_customNavigationBar) {
+        _customNavigationBar = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [FXYCommonTools fxy_statusBarHeight] + 44)];
+        _customNavigationBar.backgroundColor = [UIColor blueColor];
+    }
+    return _customNavigationBar;
+}
+
+- (UIButton *)closeButton {
+    if (!_closeButton) {
+        _closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_closeButton setImage:[UIImage fxy_imageNamedFromMyBundle:@"priceReduce_close"] forState:UIControlStateNormal];
+        [_closeButton addTarget:self.navigationController action:@selector(cancelButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        _closeButton.frame = CGRectMake(20, 15, 30, 30);
+    }
+    return _closeButton;
 }
 
 //- (UIImagePickerController *)imagePickerVc {
