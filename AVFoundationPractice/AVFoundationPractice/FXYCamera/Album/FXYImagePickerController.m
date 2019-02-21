@@ -36,6 +36,12 @@
 @property (nonatomic, strong) FXYAlbumPickerView *albumPickerView;
 /// 照片选择控制器
 @property (nonatomic, weak) FXYPhotoPickerController *photoPickerVc;
+/// 底部工具条
+@property (nonatomic, strong) UIView *bottomToolBar;
+/// 相册按钮
+@property (nonatomic, strong) UIButton *albumButton;
+/// 拍照按钮
+@property (nonatomic, strong) UIButton *takePhotoButton;
 @end
 
 @implementation FXYImagePickerController
@@ -69,6 +75,10 @@
 //    self.navigationBar.tintColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     if (self.needShowStatusBar) [UIApplication sharedApplication].statusBarHidden = NO;
+    
+    [self.view addSubview:self.bottomToolBar];
+    [self.bottomToolBar addSubview:self.albumButton];
+    [self.bottomToolBar addSubview:self.takePhotoButton];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -298,6 +308,20 @@
 - (void)settingBtnClick {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
 }
+
+/**
+ 相册按钮点击
+ */
+- (void)albumButtonClick {
+    
+}
+
+/**
+ 拍照按钮点击
+ */
+- (void)takePhotoButtonClick {
+    
+}
 #pragma mark - private
 
 /**
@@ -406,6 +430,39 @@
     }
 }
 #pragma mark - getter and setter
+
+- (UIView *)bottomToolBar {
+    if (!_bottomToolBar) {
+        CGFloat toolBarHeight = [FXYCommonTools fxy_isIPhoneX] ? 50 + (83 - 49) : 50;
+        _bottomToolBar = [[UIView alloc]initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - toolBarHeight, [UIScreen mainScreen].bounds.size.width, toolBarHeight)];
+        _bottomToolBar.backgroundColor = [UIColor redColor];
+    }
+    return _bottomToolBar;
+}
+
+- (UIButton *)albumButton {
+    if (!_albumButton) {
+        _albumButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_albumButton setTitle:@"相册" forState:UIControlStateNormal];
+        [_albumButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [_albumButton setBackgroundColor:[UIColor yellowColor]];
+        [_albumButton addTarget:self action:@selector(albumButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        _albumButton.frame = CGRectMake(30, 5, 50, 35);
+    }
+    return _albumButton;
+}
+
+- (UIButton *)takePhotoButton {
+    if (!_takePhotoButton) {
+        _takePhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_takePhotoButton setTitle:@"拍照" forState:UIControlStateNormal];
+        [_takePhotoButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [_takePhotoButton setBackgroundColor:[UIColor yellowColor]];
+        [_takePhotoButton addTarget:self action:@selector(takePhotoButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        _takePhotoButton.frame = CGRectMake(100, 5, 50, 35);
+    }
+    return _takePhotoButton;
+}
 
 - (void)setNaviBgColor:(UIColor *)naviBgColor {
     _naviBgColor = naviBgColor;
