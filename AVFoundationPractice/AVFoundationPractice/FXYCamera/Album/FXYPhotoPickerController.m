@@ -736,6 +736,7 @@ static CGFloat itemMargin = 5;
 
 - (void)setModel:(FXYAlbumModel *)model {
     _model = model;
+    [self.titleButton setTitle:model.name forState:UIControlStateNormal];
 #warning 设置数据
 }
 

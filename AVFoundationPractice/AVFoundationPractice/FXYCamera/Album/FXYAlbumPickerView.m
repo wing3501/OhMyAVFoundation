@@ -12,6 +12,7 @@
 #import "FXYCommonTools.h"
 #import "FXYAlbumModel.h"
 #import "FXYAlbumCell.h"
+#import "FXYPhotoPickerController.h"
 
 @interface FXYAlbumPickerView ()<UITableViewDataSource,UITableViewDelegate> {
     UITableView *_tableView;
@@ -123,7 +124,7 @@
     CGFloat fromHeight = show ? 0 : height;
     CGFloat toHeight = show ? height : 0;
     self.fxy_height = fromHeight;
-    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.fxy_height = toHeight;
     } completion:^(BOOL finished) {
         show ?: [self removeFromSuperview];
@@ -148,6 +149,9 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    FXYPhotoPickerController *photoPickerVc = self.imagePickerController.viewControllers.firstObject;
+    photoPickerVc.model = _albumArr[indexPath.row];
+    [self close];
 #warning 收起相册页面，刷新图片页面
     
 //    TZPhotoPickerController *photoPickerVc = [[TZPhotoPickerController alloc] init];
