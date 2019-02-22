@@ -361,7 +361,7 @@
     CGFloat imageWidth = image.size.width * image.scale;
     CGFloat imageHeight = image.size.height * image.scale;
     CGFloat heighScale = imageHeight / [UIScreen mainScreen].bounds.size.height;
-    CGRect cropFrame = CGRectMake(0, self.videoPreviewLayer.frame.origin.y * heighScale, imageWidth, imageWidth * self.videoPreviewLayer.frame.size.height / self.videoPreviewLayer.frame.size.width);
+    CGRect cropFrame = CGRectMake(0, ([UIScreen mainScreen].bounds.size.height - self.videoPreviewLayer.frame.size.height) * 0.5 * heighScale, imageWidth, imageWidth * self.videoPreviewLayer.frame.size.height / self.videoPreviewLayer.frame.size.width);
     NSLog(@"=============>%f %f %f %@ %@",image.size.width,image.size.height,image.scale,NSStringFromCGRect(self.videoPreviewLayer.frame),NSStringFromCGRect(cropFrame));
     UIImage *cropImage = [self imageByCropImage:image toRect:cropFrame];
     [OMAssetsLibraryTool writeImageToAssetsLibrary:cropImage withCompletionHandler:^(id  _Nullable obj, NSError * _Nullable error) {
