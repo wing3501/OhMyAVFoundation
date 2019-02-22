@@ -606,6 +606,11 @@ static CGFloat itemMargin = 5;
     } else {
         cell.cannotSelectLayerButton.hidden = YES;
     }
+    //如果已选中了图片，就不能选视频了
+    if (tzImagePickerVc.selectedModels.count && model.type == FXYAssetModelMediaTypeVideo && tzImagePickerVc.selectedModels.firstObject.type != FXYAssetModelMediaTypeVideo) {
+        cell.cannotSelectLayerButton.backgroundColor = tzImagePickerVc.cannotSelectLayerColor;
+        cell.cannotSelectLayerButton.hidden = NO;
+    }
     
     __weak typeof(cell) weakCell = cell;
     __weak typeof(self) weakSelf = self;
