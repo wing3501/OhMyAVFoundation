@@ -9,6 +9,7 @@
 #import "FXYCameraViewController.h"
 #import "FXYCameraManager.h"
 #import "FXYCircleProgressView.h"
+#import "OMAssetsLibraryTool.h"
 @interface FXYCameraViewController ()<FXYCameraManagerDelegate>
 /// 相机管理器
 @property (nonatomic,strong) FXYCameraManager *cameraManager;
@@ -96,6 +97,10 @@
 }
 
 #pragma mark - overwrite
+
+- (BOOL)prefersStatusBarHidden {
+    return YES;
+}
 
 #pragma mark - public
 
@@ -302,12 +307,66 @@
     CGPointMakeWithDictionaryRepresentation((CFDictionaryRef)corner, &point);
     return point;
 }
+
+/**
+ 裁剪图片
+
+ @param image 原图
+ @param rect 裁剪大小
+ @return 裁剪后的图
+ */
+- (UIImage *)imageByCropImage:(UIImage *)image toRect:(CGRect)rect {
+    rect.origin.x *= image.scale;
+    rect.origin.y *= image.scale;
+    rect.size.width *= image.scale;
+    rect.size.height *= image.scale;
+    if (rect.size.width <= 0 || rect.size.height <= 0) return nil;
+    
+    CGFloat (^rad)(CGFloat) = ^CGFloat(CGFloat deg) {
+        return deg / 180.0f * (CGFloat) M_PI;
+    };
+    
+    // determine the orientation of the image and apply a transformation to the crop rectangle to shift it to the correct position
+    CGAffineTransform rectTransform;
+    switch (image.imageOrientation) {
+        case UIImageOrientationLeft:
+            rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(rad(90)), 0, -image.size.height);
+            break;
+        case UIImageOrientationRight:
+            rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(rad(-90)), -image.size.width, 0);
+            break;
+        case UIImageOrientationDown:
+            rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(rad(-180)), -image.size.width, -image.size.height);
+            break;
+        default:
+            rectTransform = CGAffineTransformIdentity;
+    };
+    
+    // adjust the transformation scale based on the image scale
+    rectTransform = CGAffineTransformScale(rectTransform, image.scale, image.scale);
+    
+    // apply the transformation to the rect to create a new, shifted rect
+    CGRect transformedCropSquare = CGRectApplyAffineTransform(rect, rectTransform);
+    
+    CGImageRef imageRef = CGImageCreateWithImageInRect(image.CGImage, transformedCropSquare);
+    UIImage *newImage = [UIImage imageWithCGImage:imageRef scale:image.scale orientation:image.imageOrientation];
+    CGImageRelease(imageRef);
+    return newImage;
+}
 #pragma mark - FXYCameraManagerDelegate
 /**
  拍照
  */
 - (void)captureStillImage:(UIImage *)image {
-    NSLog(@"拍照结束!");
+    CGFloat imageWidth = image.size.width * image.scale;
+    CGFloat imageHeight = image.size.height * image.scale;
+    CGFloat heighScale = imageHeight / [UIScreen mainScreen].bounds.size.height;
+    CGRect cropFrame = CGRectMake(0, self.videoPreviewLayer.frame.origin.y * heighScale, imageWidth, imageWidth * self.videoPreviewLayer.frame.size.height / self.videoPreviewLayer.frame.size.width);
+    NSLog(@"=============>%f %f %f %@ %@",image.size.width,image.size.height,image.scale,NSStringFromCGRect(self.videoPreviewLayer.frame),NSStringFromCGRect(cropFrame));
+    UIImage *cropImage = [self imageByCropImage:image toRect:cropFrame];
+    [OMAssetsLibraryTool writeImageToAssetsLibrary:cropImage withCompletionHandler:^(id  _Nullable obj, NSError * _Nullable error) {
+        NSLog(@"拍照结束!");
+    }];
 }
 #pragma mark - getter and setter
 
