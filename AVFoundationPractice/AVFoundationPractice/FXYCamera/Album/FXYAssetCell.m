@@ -95,6 +95,11 @@
     } else {
         self.cannotSelectLayerButton.hidden = YES;
     }
+    //如果已选中了图片，就不能选视频了
+    if (tzImagePickerVc.selectedModels.count && self.model.type == FXYAssetModelMediaTypeVideo && tzImagePickerVc.selectedModels.firstObject.type != FXYAssetModelMediaTypeVideo) {
+        self.cannotSelectLayerButton.backgroundColor = tzImagePickerVc.cannotSelectLayerColor;
+        self.cannotSelectLayerButton.hidden = NO;
+    }
 }
 
 #pragma mark - event response
