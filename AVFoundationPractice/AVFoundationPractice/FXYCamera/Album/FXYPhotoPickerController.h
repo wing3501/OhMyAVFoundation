@@ -14,6 +14,8 @@
 @property (nonatomic, strong) FXYAlbumModel *model;
 /// 标题点击回调
 @property (nonatomic, copy) void(^titleClickBlock)(BOOL buttonSelected);
+/// 选中数量变化回调
+@property (nonatomic, copy) void(^selectedModelsChangedBlock)();
 @end
 
 @interface FXYCollectionView : UICollectionView

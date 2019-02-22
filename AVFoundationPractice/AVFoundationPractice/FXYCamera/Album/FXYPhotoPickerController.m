@@ -24,15 +24,6 @@
 
 @interface FXYPhotoPickerController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIAlertViewDelegate> {
     NSMutableArray *_models;//该相册的照片模型
-    
-    UIButton *_previewButton;
-    UIButton *_doneButton;
-    UIImageView *_numberImageView;
-    UILabel *_numberLabel;
-    UIButton *_originalPhotoButton;
-    UILabel *_originalPhotoLabel;
-    UIView *_divideLine;
-    
     BOOL _shouldScrollToBottom;
     
     CGFloat _offsetItemCount;
@@ -53,6 +44,20 @@
 @property (nonatomic, strong) UIButton *closeButton;
 /// 底部工具条
 @property (nonatomic, strong) UIView *bottomToolBar;
+/// 预览按钮
+@property (nonatomic, strong) UIButton *previewButton;
+/// 原图按钮
+@property (nonatomic, strong) UIButton *originalPhotoButton;
+/// 原图字节大小
+@property (nonatomic, strong) UILabel *originalPhotoLabel;
+/// 完成按钮
+@property (nonatomic, strong) UIButton *doneButton;
+/// 数字背景图
+@property (nonatomic, strong) UIImageView *numberImageView;
+/// 数字文本
+@property (nonatomic, strong) UILabel *numberLabel;
+/// 分隔线
+@property (nonatomic, strong) UIView *divideLine;
 @end
 
 static CGSize AssetGridThumbnailSize;
@@ -182,14 +187,14 @@ static CGFloat itemMargin = 5;
         [_collectionView setContentOffset:CGPointMake(0, offsetY)];
     }
     
-    CGFloat toolBarTop = 0;
-    if (!self.navigationController.navigationBar.isHidden) {
-        toolBarTop = self.view.fxy_height - toolBarHeight;
-    } else {
-        CGFloat navigationHeight = naviBarHeight + [FXYCommonTools fxy_statusBarHeight];
-        toolBarTop = self.view.fxy_height - toolBarHeight - navigationHeight;
-    }
-    _bottomToolBar.frame = CGRectMake(0, toolBarTop, self.view.fxy_width, toolBarHeight);
+//    CGFloat toolBarTop = 0;
+//    if (!self.navigationController.navigationBar.isHidden) {
+//        toolBarTop = self.view.fxy_height - toolBarHeight;
+//    } else {
+//        CGFloat navigationHeight = naviBarHeight + [FXYCommonTools fxy_statusBarHeight];
+//        toolBarTop = self.view.fxy_height - toolBarHeight - navigationHeight;
+//    }
+    _bottomToolBar.frame = CGRectMake(0, self.view.fxy_height - toolBarHeight, self.view.fxy_width, toolBarHeight);
     
     CGFloat previewWidth = [tzImagePickerVc.previewBtnTitleStr boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16]} context:nil].size.width + 2;
     if (!tzImagePickerVc.allowPreview) {
@@ -259,16 +264,14 @@ static CGFloat itemMargin = 5;
  预览按钮点击
  */
 - (void)previewButtonClick {
-#warning 可能不需要
-//    TZPhotoPreviewController *photoPreviewVc = [[TZPhotoPreviewController alloc] init];
-//    [self pushPhotoPrevireViewController:photoPreviewVc needCheckSelectedModels:YES];
+    FXYPhotoPreviewController *photoPreviewVc = [[FXYPhotoPreviewController alloc] init];
+    [self pushPhotoPrevireViewController:photoPreviewVc needCheckSelectedModels:YES];
 }
 
 /**
  选中原图
  */
 - (void)originalPhotoButtonClick {
-#warning 可能不需要
     _originalPhotoButton.selected = !_originalPhotoButton.isSelected;
     _isSelectOriginalPhoto = _originalPhotoButton.isSelected;
     _originalPhotoLabel.hidden = !_originalPhotoButton.isSelected;
@@ -416,76 +419,29 @@ static CGFloat itemMargin = 5;
     FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
     if (!tzImagePickerVc.showSelectBtn) return;
     
-    
 #warning 底部条的效果待定，切换拍照等+选中的图片
-    
-//    _previewButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//    [_previewButton addTarget:self action:@selector(previewButtonClick) forControlEvents:UIControlEventTouchUpInside];
-//    _previewButton.titleLabel.font = [UIFont systemFontOfSize:16];
-//    [_previewButton setTitle:tzImagePickerVc.previewBtnTitleStr forState:UIControlStateNormal];
-//    [_previewButton setTitle:tzImagePickerVc.previewBtnTitleStr forState:UIControlStateDisabled];
-//    [_previewButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-//    [_previewButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-//    _previewButton.enabled = tzImagePickerVc.selectedModels.count;
-//
-//    if (tzImagePickerVc.allowPickingOriginalPhoto) {
-//        _originalPhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//        _originalPhotoButton.imageEdgeInsets = UIEdgeInsetsMake(0, [FXYCommonTools fxy_isRightToLeftLayout] ? 10 : -10, 0, 0);
-//        [_originalPhotoButton addTarget:self action:@selector(originalPhotoButtonClick) forControlEvents:UIControlEventTouchUpInside];
-//        _originalPhotoButton.titleLabel.font = [UIFont systemFontOfSize:16];
-//        [_originalPhotoButton setTitle:tzImagePickerVc.fullImageBtnTitleStr forState:UIControlStateNormal];
-//        [_originalPhotoButton setTitle:tzImagePickerVc.fullImageBtnTitleStr forState:UIControlStateSelected];
-//        [_originalPhotoButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
-//        [_originalPhotoButton setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
-//        [_originalPhotoButton setImage:tzImagePickerVc.photoOriginDefImage forState:UIControlStateNormal];
-//        [_originalPhotoButton setImage:tzImagePickerVc.photoOriginSelImage forState:UIControlStateSelected];
-//        _originalPhotoButton.imageView.clipsToBounds = YES;
-//        _originalPhotoButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
-//        _originalPhotoButton.selected = _isSelectOriginalPhoto;
-//        _originalPhotoButton.enabled = tzImagePickerVc.selectedModels.count > 0;
-//
-//        _originalPhotoLabel = [[UILabel alloc] init];
-//        _originalPhotoLabel.textAlignment = NSTextAlignmentLeft;
-//        _originalPhotoLabel.font = [UIFont systemFontOfSize:16];
-//        _originalPhotoLabel.textColor = [UIColor blackColor];
-//        if (_isSelectOriginalPhoto) [self getSelectedPhotoBytes];
-//    }
-//
-//    _doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//    _doneButton.titleLabel.font = [UIFont systemFontOfSize:16];
-//    [_doneButton addTarget:self action:@selector(doneButtonClick) forControlEvents:UIControlEventTouchUpInside];
-//    [_doneButton setTitle:tzImagePickerVc.doneBtnTitleStr forState:UIControlStateNormal];
-//    [_doneButton setTitle:tzImagePickerVc.doneBtnTitleStr forState:UIControlStateDisabled];
-//    [_doneButton setTitleColor:tzImagePickerVc.oKButtonTitleColorNormal forState:UIControlStateNormal];
-//    [_doneButton setTitleColor:tzImagePickerVc.oKButtonTitleColorDisabled forState:UIControlStateDisabled];
-//    _doneButton.enabled = tzImagePickerVc.selectedModels.count || tzImagePickerVc.alwaysEnableDoneBtn;
-//
-//    _numberImageView = [[UIImageView alloc] initWithImage:tzImagePickerVc.photoNumberIconImage];
-//    _numberImageView.hidden = tzImagePickerVc.selectedModels.count <= 0;
-//    _numberImageView.clipsToBounds = YES;
-//    _numberImageView.contentMode = UIViewContentModeScaleAspectFit;
-//    _numberImageView.backgroundColor = [UIColor clearColor];
-//
-//    _numberLabel = [[UILabel alloc] init];
-//    _numberLabel.font = [UIFont systemFontOfSize:15];
-//    _numberLabel.textColor = [UIColor whiteColor];
-//    _numberLabel.textAlignment = NSTextAlignmentCenter;
-//    _numberLabel.text = [NSString stringWithFormat:@"%zd",tzImagePickerVc.selectedModels.count];
-//    _numberLabel.hidden = tzImagePickerVc.selectedModels.count <= 0;
-//    _numberLabel.backgroundColor = [UIColor clearColor];
-//
-//    _divideLine = [[UIView alloc] init];
-//    CGFloat rgb2 = 222 / 255.0;
-//    _divideLine.backgroundColor = [UIColor colorWithRed:rgb2 green:rgb2 blue:rgb2 alpha:1.0];
-//
-//    [_bottomToolBar addSubview:_divideLine];
-//    [_bottomToolBar addSubview:_previewButton];
-//    [_bottomToolBar addSubview:_doneButton];
-//    [_bottomToolBar addSubview:_numberImageView];
-//    [_bottomToolBar addSubview:_numberLabel];
-//    [_bottomToolBar addSubview:_originalPhotoButton];
-//    [self.view addSubview:self.bottomToolBar];
-//    [_originalPhotoButton addSubview:_originalPhotoLabel];
+
+    self.previewButton.enabled = tzImagePickerVc.selectedModels.count;
+
+    if (tzImagePickerVc.allowPickingOriginalPhoto) {
+        self.originalPhotoButton.selected = _isSelectOriginalPhoto;
+        self.originalPhotoButton.enabled = tzImagePickerVc.selectedModels.count > 0;
+        
+        if (_isSelectOriginalPhoto) [self getSelectedPhotoBytes];
+    }
+
+    self.doneButton.enabled = tzImagePickerVc.selectedModels.count || tzImagePickerVc.alwaysEnableDoneBtn;
+    self.numberLabel.text = [NSString stringWithFormat:@"%zd",tzImagePickerVc.selectedModels.count];
+    self.numberLabel.hidden = tzImagePickerVc.selectedModels.count <= 0;
+
+    [self.bottomToolBar addSubview:self.divideLine];
+    [self.bottomToolBar addSubview:self.previewButton];
+    [self.bottomToolBar addSubview:self.doneButton];
+    [self.bottomToolBar addSubview:self.numberImageView];
+    [self.bottomToolBar addSubview:self.numberLabel];
+    [self.bottomToolBar addSubview:self.originalPhotoButton];
+    [self.view addSubview:self.bottomToolBar];
+    [self.originalPhotoButton addSubview:self.originalPhotoLabel];
 }
 
 /**
@@ -548,20 +504,19 @@ static CGFloat itemMargin = 5;
  刷新底部栏
  */
 - (void)refreshBottomToolBarStatus {
-#warning 功能不一样
-//    FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
-//
-//    _previewButton.enabled = tzImagePickerVc.selectedModels.count > 0;
-//    _doneButton.enabled = tzImagePickerVc.selectedModels.count > 0 || tzImagePickerVc.alwaysEnableDoneBtn;
-//
-//    _numberImageView.hidden = tzImagePickerVc.selectedModels.count <= 0;
-//    _numberLabel.hidden = tzImagePickerVc.selectedModels.count <= 0;
-//    _numberLabel.text = [NSString stringWithFormat:@"%zd",tzImagePickerVc.selectedModels.count];
-//
-//    _originalPhotoButton.enabled = tzImagePickerVc.selectedModels.count > 0;
-//    _originalPhotoButton.selected = (_isSelectOriginalPhoto && _originalPhotoButton.enabled);
-//    _originalPhotoLabel.hidden = (!_originalPhotoButton.isSelected);
-//    if (_isSelectOriginalPhoto) [self getSelectedPhotoBytes];
+    FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
+
+    _previewButton.enabled = tzImagePickerVc.selectedModels.count > 0;
+    _doneButton.enabled = tzImagePickerVc.selectedModels.count > 0 || tzImagePickerVc.alwaysEnableDoneBtn;
+
+    _numberImageView.hidden = tzImagePickerVc.selectedModels.count <= 0;
+    _numberLabel.hidden = tzImagePickerVc.selectedModels.count <= 0;
+    _numberLabel.text = [NSString stringWithFormat:@"%zd",tzImagePickerVc.selectedModels.count];
+
+    _originalPhotoButton.enabled = tzImagePickerVc.selectedModels.count > 0;
+    _originalPhotoButton.selected = (_isSelectOriginalPhoto && _originalPhotoButton.enabled);
+    _originalPhotoLabel.hidden = (!_originalPhotoButton.isSelected);
+    if (_isSelectOriginalPhoto) [self getSelectedPhotoBytes];
 }
 
 /**
@@ -698,6 +653,7 @@ static CGFloat itemMargin = 5;
                 [tzImagePickerVc showAlertWithTitle:title];
             }
         }
+        !weakSelf.selectedModelsChangedBlock ?: weakSelf.selectedModelsChangedBlock();
     };
     return cell;
 }
@@ -801,6 +757,98 @@ static CGFloat itemMargin = 5;
     }
     return _closeButton;
 }
+
+- (UIButton *)previewButton {
+    if (!_previewButton) {
+        FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
+        _previewButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_previewButton addTarget:self action:@selector(previewButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        _previewButton.titleLabel.font = [UIFont systemFontOfSize:16];
+        [_previewButton setTitle:tzImagePickerVc.previewBtnTitleStr forState:UIControlStateNormal];
+        [_previewButton setTitle:tzImagePickerVc.previewBtnTitleStr forState:UIControlStateDisabled];
+        [_previewButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [_previewButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+    }
+    return _previewButton;
+}
+
+- (UIButton *)originalPhotoButton {
+    if (!_originalPhotoButton) {
+        FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
+        _originalPhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _originalPhotoButton.imageEdgeInsets = UIEdgeInsetsMake(0, [FXYCommonTools fxy_isRightToLeftLayout] ? 10 : -10, 0, 0);
+        [_originalPhotoButton addTarget:self action:@selector(originalPhotoButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        _originalPhotoButton.titleLabel.font = [UIFont systemFontOfSize:16];
+        [_originalPhotoButton setTitle:tzImagePickerVc.fullImageBtnTitleStr forState:UIControlStateNormal];
+        [_originalPhotoButton setTitle:tzImagePickerVc.fullImageBtnTitleStr forState:UIControlStateSelected];
+        [_originalPhotoButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+        [_originalPhotoButton setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
+        [_originalPhotoButton setImage:tzImagePickerVc.photoOriginDefImage forState:UIControlStateNormal];
+        [_originalPhotoButton setImage:tzImagePickerVc.photoOriginSelImage forState:UIControlStateSelected];
+        _originalPhotoButton.imageView.clipsToBounds = YES;
+        _originalPhotoButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    }
+    return _originalPhotoButton;
+}
+
+- (UILabel *)originalPhotoLabel {
+    if (!_originalPhotoLabel) {
+        _originalPhotoLabel = [[UILabel alloc] init];
+        _originalPhotoLabel.textAlignment = NSTextAlignmentLeft;
+        _originalPhotoLabel.font = [UIFont systemFontOfSize:16];
+        _originalPhotoLabel.textColor = [UIColor blackColor];
+    }
+    return _originalPhotoLabel;
+}
+
+- (UIButton *)doneButton {
+    if (!_doneButton) {
+        FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
+        _doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _doneButton.titleLabel.font = [UIFont systemFontOfSize:16];
+        [_doneButton addTarget:self action:@selector(doneButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        [_doneButton setTitle:tzImagePickerVc.doneBtnTitleStr forState:UIControlStateNormal];
+        [_doneButton setTitle:tzImagePickerVc.doneBtnTitleStr forState:UIControlStateDisabled];
+        [_doneButton setTitleColor:tzImagePickerVc.oKButtonTitleColorNormal forState:UIControlStateNormal];
+        [_doneButton setTitleColor:tzImagePickerVc.oKButtonTitleColorDisabled forState:UIControlStateDisabled];
+    }
+    return _doneButton;
+}
+
+- (UIImageView *)numberImageView {
+    if (!_numberImageView) {
+        FXYImagePickerController *tzImagePickerVc = (FXYImagePickerController *)self.navigationController;
+        _numberImageView = [[UIImageView alloc] initWithImage:tzImagePickerVc.photoNumberIconImage];
+        _numberImageView.hidden = tzImagePickerVc.selectedModels.count <= 0;
+        _numberImageView.clipsToBounds = YES;
+        _numberImageView.contentMode = UIViewContentModeScaleAspectFit;
+        _numberImageView.backgroundColor = [UIColor clearColor];
+    }
+    return _numberImageView;
+}
+
+- (UILabel *)numberLabel {
+    if (!_numberLabel) {
+        _numberLabel = [[UILabel alloc] init];
+        _numberLabel.font = [UIFont systemFontOfSize:15];
+        _numberLabel.textColor = [UIColor whiteColor];
+        _numberLabel.textAlignment = NSTextAlignmentCenter;
+        _numberLabel.backgroundColor = [UIColor clearColor];
+    }
+    return _numberLabel;
+}
+
+- (UIView *)divideLine {
+    if (!_divideLine) {
+        _divideLine = [[UIView alloc] init];
+        CGFloat rgb2 = 222 / 255.0;
+        _divideLine.backgroundColor = [UIColor colorWithRed:rgb2 green:rgb2 blue:rgb2 alpha:1.0];
+    }
+    return _divideLine;
+}
+
+
+
 
 //- (UIImagePickerController *)imagePickerVc {
 //    if (_imagePickerVc == nil) {

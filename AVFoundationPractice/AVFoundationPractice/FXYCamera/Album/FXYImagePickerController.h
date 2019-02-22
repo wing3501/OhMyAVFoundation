@@ -65,6 +65,9 @@
 /// The minimum count photos user must pick, Default is 0
 /// 最小照片必选张数,默认是0
 @property (nonatomic, assign) NSInteger minImagesCount;
+/// Always enale the done button, not require minimum 1 photo be picked
+/// 让完成按钮一直可以点击，无须最少选择一张图片
+@property (nonatomic, assign) BOOL alwaysEnableDoneBtn;
 /// Sort photos ascending by modificationDate，Default is YES
 /// 对照片排序，按修改时间升序，默认是YES。如果设置为NO,最新的照片会显示在最前面，内部的拍照按钮会排在第一个
 @property (nonatomic, assign) BOOL sortAscendingByModificationDate;

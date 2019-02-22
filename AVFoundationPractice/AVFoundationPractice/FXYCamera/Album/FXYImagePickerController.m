@@ -118,6 +118,11 @@
         __strong typeof(weakSelf) strongSelf = weakSelf;
         [strongSelf showAlbumPickerView:buttonSelected];
     };
+    photoPickerVc.selectedModelsChangedBlock = ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf showOrHideBottomToolBar];
+    };
+    
     self = [super initWithRootViewController:photoPickerVc];
     if (self) {
         _photoPickerVc = photoPickerVc;
@@ -444,6 +449,14 @@
     }else{
         [self.albumPickerView close];
     }
+}
+
+/**
+ 显示或隐藏底部栏
+ */
+- (void)showOrHideBottomToolBar {
+    //当有选中数据时，隐藏导航控制器的底部栏，透出照片选择控制器的底部栏
+    self.bottomToolBar.hidden = self.selectedModels.count;
 }
 
 #pragma mark - UINavigationControllerDelegate
