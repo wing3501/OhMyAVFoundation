@@ -66,6 +66,7 @@
         NSLog(@"Error: %@", [error localizedDescription]);
     }
     [self setupUI];
+    self.progressView.needAnimation = NO;
 }
 
 - (void)dealloc {
@@ -301,15 +302,13 @@
     CGPointMakeWithDictionaryRepresentation((CFDictionaryRef)corner, &point);
     return point;
 }
-#pragma mark - OMCircleProgressViewDelegate
-
-//- (void)progressViewDidSingleTap:(OMCircleProgressView *)progressView {
-//    [self.cameraManager captureStillImage];//拍照
-//}
-//
-
 #pragma mark - FXYCameraManagerDelegate
-
+/**
+ 拍照
+ */
+- (void)captureStillImage:(UIImage *)image {
+    NSLog(@"拍照结束!");
+}
 #pragma mark - getter and setter
 
 - (FXYCameraManager *)cameraManager {
@@ -346,7 +345,8 @@
         WEAKSELF
         _progressView.clickBlock = ^(BOOL isStop) {
             STRONGSELF
-            isStop ? [strongSelf.cameraManager stopRecording] : [strongSelf.cameraManager startRecording];
+            [strongSelf.cameraManager captureStillImage];//拍照
+//            isStop ? [strongSelf.cameraManager stopRecording] : [strongSelf.cameraManager startRecording];
         };
     }
     return _progressView;

@@ -11,6 +11,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FXYCircleProgressView : UIView
+/// 是否需要进度动画
+@property (nonatomic, assign) BOOL needAnimation;
 /// 点击回调
 @property (nonatomic, copy) void(^clickBlock)(BOOL isStop);
 @end

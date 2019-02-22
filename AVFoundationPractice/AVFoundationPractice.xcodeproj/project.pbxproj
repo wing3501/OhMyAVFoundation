@@ -224,6 +224,19 @@
 			path = Album;
 			sourceTree = "<group>";
 		};
+		62088744221F95E0002B9AAF /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				62F808FB221694BB000EFA19 /* FXYCameraViewController.h */,
+				62F808FC221694BB000EFA19 /* FXYCameraViewController.m */,
+				62F808FE2216953B000EFA19 /* FXYCameraManager.h */,
+				62F808FF2216953B000EFA19 /* FXYCameraManager.m */,
+				62F809012216BC8B000EFA19 /* FXYCircleProgressView.h */,
+				62F809022216BC8B000EFA19 /* FXYCircleProgressView.m */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
 		62179762216F4F1400AC1756 = {
 			isa = PBXGroup;
 			children = (
@@ -376,13 +389,8 @@
 		62F808FA2216948B000EFA19 /* FXYCamera */ = {
 			isa = PBXGroup;
 			children = (
+				62088744221F95E0002B9AAF /* Camera */,
 				6205C92D221BF20B00B576C2 /* Album */,
-				62F808FB221694BB000EFA19 /* FXYCameraViewController.h */,
-				62F808FC221694BB000EFA19 /* FXYCameraViewController.m */,
-				62F808FE2216953B000EFA19 /* FXYCameraManager.h */,
-				62F808FF2216953B000EFA19 /* FXYCameraManager.m */,
-				62F809012216BC8B000EFA19 /* FXYCircleProgressView.h */,
-				62F809022216BC8B000EFA19 /* FXYCircleProgressView.m */,
 			);
 			path = FXYCamera;
 			sourceTree = "<group>";

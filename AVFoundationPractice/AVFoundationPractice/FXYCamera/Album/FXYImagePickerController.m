@@ -114,6 +114,8 @@
     self = [super initWithRootViewController:photoPickerVc];
     if (self) {
         _photoPickerVc = photoPickerVc;
+        FXYCameraViewController *vc = [[FXYCameraViewController alloc]init];
+        [self pushViewController:vc animated:NO];
         
         FXYAlbumPickerView *albumPickerView = [[FXYAlbumPickerView alloc]initWithImagePickerController:self];
         albumPickerView.isFirstAppear = YES;

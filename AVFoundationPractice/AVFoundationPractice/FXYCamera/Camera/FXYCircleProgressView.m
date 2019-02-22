@@ -69,6 +69,10 @@ static NSTimeInterval const kTimelimit = 15.0;
  单击事件
  */
 - (void)singleTap:(UITapGestureRecognizer *)sender {
+    if(!_needAnimation) {
+        !_clickBlock ?: _clickBlock(YES);
+        return;
+    }
     if (!self.displayLink.paused) {
         //暂停
         self->tempTime = self->progressTime;
