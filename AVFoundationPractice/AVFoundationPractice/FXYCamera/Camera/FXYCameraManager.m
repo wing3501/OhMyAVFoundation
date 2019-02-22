@@ -140,7 +140,10 @@ static const NSString *OMCameraAdjustingExposureContext;
             NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:sampleBuffer];
             
             UIImage *image = [[UIImage alloc] initWithData:imageData];
-            [strongSelf writeImageToAssetsLibrary:image];
+//            [strongSelf writeImageToAssetsLibrary:image];
+            if ([strongSelf.delegate respondsToSelector:@selector(captureStillImage:)]) {
+                [strongSelf.delegate captureStillImage:image];
+            }
         } else {
             NSLog(@"NULL sampleBuffer: %@", [error localizedDescription]);
         }

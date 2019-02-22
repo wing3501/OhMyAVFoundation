@@ -15,7 +15,7 @@
 /// 标题点击回调
 @property (nonatomic, copy) void(^titleClickBlock)(BOOL buttonSelected);
 /// 选中数量变化回调
-@property (nonatomic, copy) void(^selectedModelsChangedBlock)();
+@property (nonatomic, copy) void(^selectedModelsChangedBlock)(void);
 @end
 
 @interface FXYCollectionView : UICollectionView

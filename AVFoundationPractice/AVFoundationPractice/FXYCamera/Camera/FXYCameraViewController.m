@@ -10,7 +10,10 @@
 #import "FXYCameraManager.h"
 #import "FXYCircleProgressView.h"
 #import "OMAssetsLibraryTool.h"
-@interface FXYCameraViewController ()<FXYCameraManagerDelegate>
+#import "FXYPhotoCell.h"
+@interface FXYCameraViewController ()<FXYCameraManagerDelegate,UICollectionViewDelegate,UICollectionViewDataSource> {
+    NSMutableArray *_dataArray;
+}
 /// 相机管理器
 @property (nonatomic,strong) FXYCameraManager *cameraManager;
 /// 预览图层
@@ -42,6 +45,8 @@
 /// 双指双击复原
 @property (nonatomic,strong) UITapGestureRecognizer *doubleDoubleTapRecognizer;
 
+/// 拍摄的照片列表
+@property (nonatomic, strong) UICollectionView *collectionView;
 @end
 
 @implementation FXYCameraViewController
@@ -57,7 +62,7 @@
  初始化
  */
 - (void)commonInit {
-    [self.navigationController setNavigationBarHidden:YES];
+    _dataArray = @[].mutableCopy;
     NSError *error;
     if ([self.cameraManager setupSession:&error]) {
         [self.view.layer addSublayer:self.videoPreviewLayer];
@@ -79,6 +84,7 @@
  设置视图
  */
 - (void)setupUI {
+    [self.navigationController setNavigationBarHidden:YES];
     self.view.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.bottomView];
     [self.bottomView addSubview:self.progressView];
@@ -87,6 +93,7 @@
     [self.view addSubview:self.torchButton];
     [self.view addSubview:self.flashButton];
     [self.view addSubview:self.rateButton];
+    [self.view addSubview:self.collectionView];
     
     [self.view addGestureRecognizer:self.singleTapRecognizer];
     [self.view addGestureRecognizer:self.doubleTapRecognizer];
@@ -362,12 +369,27 @@
     CGFloat imageHeight = image.size.height * image.scale;
     CGFloat heighScale = imageHeight / [UIScreen mainScreen].bounds.size.height;
     CGRect cropFrame = CGRectMake(0, ([UIScreen mainScreen].bounds.size.height - self.videoPreviewLayer.frame.size.height) * 0.5 * heighScale, imageWidth, imageWidth * self.videoPreviewLayer.frame.size.height / self.videoPreviewLayer.frame.size.width);
-    NSLog(@"=============>%f %f %f %@ %@",image.size.width,image.size.height,image.scale,NSStringFromCGRect(self.videoPreviewLayer.frame),NSStringFromCGRect(cropFrame));
+//    NSLog(@"=============>%f %f %f %@ %@",image.size.width,image.size.height,image.scale,NSStringFromCGRect(self.videoPreviewLayer.frame),NSStringFromCGRect(cropFrame));
     UIImage *cropImage = [self imageByCropImage:image toRect:cropFrame];
-    [OMAssetsLibraryTool writeImageToAssetsLibrary:cropImage withCompletionHandler:^(id  _Nullable obj, NSError * _Nullable error) {
-        NSLog(@"拍照结束!");
-    }];
+//    [OMAssetsLibraryTool writeImageToAssetsLibrary:cropImage withCompletionHandler:^(id  _Nullable obj, NSError * _Nullable error) {
+//        NSLog(@"拍照结束!");
+        [self->_dataArray addObject:cropImage];
+        [self.collectionView reloadData];
+//    }];
 }
+
+#pragma mark - UICollectionViewDataSource
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return _dataArray.count;
+}
+
+- (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    FXYPhotoCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"FXYPhotoCell" forIndexPath:indexPath];
+    cell.image = _dataArray[indexPath.row];
+    return cell;
+}
+
 #pragma mark - getter and setter
 
 - (FXYCameraManager *)cameraManager {
@@ -517,5 +539,29 @@
         _rateButton.frame = CGRectMake(ScreenWidth - 90 - 50, 30, 50, 21);
     }
     return _rateButton;
+}
+
+- (UICollectionView *)collectionView {
+    if (!_collectionView) {
+        CGFloat sectionMargin = 5;
+        CGFloat itemMargin = 5;
+        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+        layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        layout.sectionInset = UIEdgeInsetsMake(0, sectionMargin, 0, sectionMargin);
+        layout.minimumInteritemSpacing = itemMargin;
+        layout.itemSize = CGSizeMake(40,40);
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+        _collectionView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+        _collectionView.delegate = self;
+        _collectionView.dataSource = self;
+        _collectionView.showsHorizontalScrollIndicator = NO;
+        _collectionView.showsVerticalScrollIndicator = NO;
+        [_collectionView registerClass:[FXYPhotoCell class] forCellWithReuseIdentifier:@"FXYPhotoCell"];
+        CGFloat height43 = floor(ScreenWidth * 4 / 3.0);
+        CGFloat bottomHeight = ScreenHeight - height43;
+        CGFloat height = 50;
+        _collectionView.frame = CGRectMake(0, ScreenHeight - bottomHeight - height, ScreenWidth, height);
+    }
+    return _collectionView;
 }
 @end
