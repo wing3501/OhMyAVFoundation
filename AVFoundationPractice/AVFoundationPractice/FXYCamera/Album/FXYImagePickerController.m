@@ -26,7 +26,7 @@
     UIView *_HUDContainer;
     UIActivityIndicatorView *_HUDIndicatorView;
     UILabel *_HUDLabel;
-    
+    BOOL _firstLoadedPhoto;
     UIStatusBarStyle _originStatusBarStyle;
 }
 
@@ -89,6 +89,13 @@
     [super viewWillAppear:animated];
     _originStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
     [UIApplication sharedApplication].statusBarStyle = self.statusBarStyle;
+    //第一次获取默认相册的照片数据
+    if (!_firstLoadedPhoto) {
+        _firstLoadedPhoto = YES;
+        [[FXYImageManager manager] getCameraRollAlbum:self.allowPickingVideo allowPickingImage:self.allowPickingImage needFetchAssets:NO completion:^(FXYAlbumModel *model) {
+            self.photoPickerVc.model = model;
+        }];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -114,8 +121,10 @@
     self = [super initWithRootViewController:photoPickerVc];
     if (self) {
         _photoPickerVc = photoPickerVc;
-        FXYCameraViewController *vc = [[FXYCameraViewController alloc]init];
-        [self pushViewController:vc animated:NO];
+        //跳转到拍照
+#warning 跳转到拍照
+//        FXYCameraViewController *vc = [[FXYCameraViewController alloc]init];
+//        [self pushViewController:vc animated:NO];
         
         FXYAlbumPickerView *albumPickerView = [[FXYAlbumPickerView alloc]initWithImagePickerController:self];
         albumPickerView.isFirstAppear = YES;
@@ -165,10 +174,6 @@
             if ([PHPhotoLibrary authorizationStatus] == 0) {
                 _timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(observeAuthrizationStatusChange) userInfo:nil repeats:NO];
             }
-        } else {
-            [[FXYImageManager manager] getCameraRollAlbum:self.allowPickingVideo allowPickingImage:self.allowPickingImage needFetchAssets:NO completion:^(FXYAlbumModel *model) {
-                photoPickerVc.model = model;
-            }];
         }
     }
     return self;
