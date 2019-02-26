@@ -7,7 +7,7 @@
 //
 
 #import "FXYCircleProgressView.h"
-
+#import "UIView+FXYLayout.h"
 static NSTimeInterval const kTimelimit = 15.0;
 
 @interface FXYCircleProgressView(){
@@ -23,7 +23,8 @@ static NSTimeInterval const kTimelimit = 15.0;
 @property (nonatomic,strong) CADisplayLink *displayLink;
 /// 进度动画
 @property (nonatomic, strong) CAShapeLayer *shapeLayer;
-
+/// 数字
+@property (nonatomic, strong) UILabel *numberLabel;
 @end
 @implementation FXYCircleProgressView
 
@@ -53,6 +54,7 @@ static NSTimeInterval const kTimelimit = 15.0;
     self.layer.masksToBounds = YES;
     
     [self addSubview:self.whiteView];
+    [self addSubview:self.numberLabel];
     [self.whiteView.layer addSublayer:self.shapeLayer];
     [self addGestureRecognizer:self.tapGestureRecognizer];
 }
@@ -107,6 +109,14 @@ static NSTimeInterval const kTimelimit = 15.0;
 
 #pragma mark - getter and setter
 
+- (void)setNumberText:(NSString *)numberText {
+    _numberText = numberText;
+    self.numberLabel.hidden = !numberText.length;
+    self.numberLabel.text = numberText;
+    [self.numberLabel sizeToFit];
+    self.numberLabel.center = CGPointMake(self.fxy_width * 0.5, self.fxy_height * 0.5);
+}
+
 - (UIView *)whiteView {
     if (!_whiteView) {
         CGFloat width = self.bounds.size.width;
@@ -145,4 +155,15 @@ static NSTimeInterval const kTimelimit = 15.0;
     }
     return _shapeLayer;
 }
+
+- (UILabel *)numberLabel {
+    if (!_numberLabel) {
+        _numberLabel = [[UILabel alloc]init];
+        _numberLabel.textColor = [UIColor blackColor];
+        _numberLabel.textAlignment = NSTextAlignmentCenter;
+        _numberLabel.hidden = YES;
+    }
+    return _numberLabel;
+}
+
 @end

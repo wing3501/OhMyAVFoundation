@@ -11,6 +11,8 @@
 #import "FXYCircleProgressView.h"
 #import "OMAssetsLibraryTool.h"
 #import "FXYPhotoCell.h"
+#import "FXYImagePickerController.h"
+#import "UIView+FXYLayout.h"
 @interface FXYCameraViewController ()<FXYCameraManagerDelegate,UICollectionViewDelegate,UICollectionViewDataSource> {
     NSMutableArray *_dataArray;
 }
@@ -22,6 +24,8 @@
 @property (nonatomic, strong) UIView *bottomView;
 /// 拍摄按钮
 @property (nonatomic,strong) FXYCircleProgressView *progressView;
+/// 图片数量上限文案
+@property (nonatomic, strong) UILabel *imageLimitLabel;
 /// 关闭按钮
 @property (nonatomic,strong) UIButton *closeButton;
 /// 切换摄像头按钮
@@ -47,6 +51,8 @@
 
 /// 拍摄的照片列表
 @property (nonatomic, strong) UICollectionView *collectionView;
+/// 图片剩余可拍的数量
+@property (nonatomic, assign) NSInteger maxImagesCount;
 @end
 
 @implementation FXYCameraViewController
@@ -73,6 +79,9 @@
     }
     [self setupUI];
     self.progressView.needAnimation = NO;
+    FXYImagePickerController *nav = (FXYImagePickerController *)self.navigationController;
+    self.maxImagesCount = nav.maxImagesCount;
+    self.progressView.numberText = [NSString stringWithFormat:@"%ld",(long)self.maxImagesCount];
 }
 
 - (void)dealloc {
@@ -89,6 +98,7 @@
     [self.view addSubview:self.bottomView];
     [self.bottomView addSubview:self.progressView];
     [self.bottomView addSubview:self.closeButton];
+    [self.bottomView addSubview:self.imageLimitLabel];
     [self.view addSubview:self.switchCameraButton];
     [self.view addSubview:self.torchButton];
     [self.view addSubview:self.flashButton];
@@ -100,7 +110,6 @@
     [self.view addGestureRecognizer:self.doubleDoubleTapRecognizer];
     [self.view addSubview:self.focusBox];
     [self.view addSubview:self.exposureBox];
-    
 }
 
 #pragma mark - overwrite
@@ -376,6 +385,10 @@
         [self->_dataArray addObject:cropImage];
         [self.collectionView reloadData];
 //    }];
+    
+    //拍照成功，显示剩余可拍的数量
+    self.progressView.numberText = [NSString stringWithFormat:@"%ld",(long)(--self.maxImagesCount)];
+    self.imageLimitLabel.hidden = (self.maxImagesCount > 0);
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -426,11 +439,26 @@
         WEAKSELF
         _progressView.clickBlock = ^(BOOL isStop) {
             STRONGSELF
-            [strongSelf.cameraManager captureStillImage];//拍照
+            if (strongSelf.maxImagesCount > 0) {
+                [strongSelf.cameraManager captureStillImage];//拍照
+            }
 //            isStop ? [strongSelf.cameraManager stopRecording] : [strongSelf.cameraManager startRecording];
         };
     }
     return _progressView;
+}
+
+- (UILabel *)imageLimitLabel {
+    if (!_imageLimitLabel) {
+        _imageLimitLabel = [[UILabel alloc]init];
+        _imageLimitLabel.textColor = [UIColor blackColor];
+        _imageLimitLabel.text = @"图片数量已达上限";
+        [_imageLimitLabel sizeToFit];
+        _imageLimitLabel.fxy_centerX = self.progressView.fxy_centerX;
+        _imageLimitLabel.fxy_top = self.progressView.fxy_bottom + 10;
+        _imageLimitLabel.hidden = YES;
+    }
+    return _imageLimitLabel;
 }
 
 - (UIButton *)closeButton {
@@ -489,6 +517,7 @@
 
 - (UITapGestureRecognizer *)doubleTapRecognizer {
     if (!_doubleTapRecognizer) {
+#warning 手势target不对，可能要加一个手势层，或者判断点是否在预览图层上
         _doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
         _doubleTapRecognizer.numberOfTapsRequired = 2;
         _doubleTapRecognizer.enabled = self.cameraManager.cameraSupportsTapToExpose;
