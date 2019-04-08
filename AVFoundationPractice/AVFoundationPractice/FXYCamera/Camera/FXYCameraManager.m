@@ -182,6 +182,7 @@ static const NSString *OMCameraAdjustingExposureContext;
  开始录制视频
  */
 - (void)startRecording {
+    NSLog(@"开始录制视频");
     WEAKSELF
     dispatch_async(self.videoQueue, ^{
         STRONGSELF
@@ -220,6 +221,7 @@ static const NSString *OMCameraAdjustingExposureContext;
  停止录制视频
  */
 - (void)stopRecording {
+    NSLog(@"停止录制视频");
     dispatch_async(self.videoQueue, ^{
         if ([self isRecording]) {
             [self.movieOutput stopRecording];

@@ -78,7 +78,7 @@
         NSLog(@"Error: %@", [error localizedDescription]);
     }
     [self setupUI];
-    self.progressView.needAnimation = NO;
+    self.progressView.needAnimation = YES;
     FXYImagePickerController *nav = (FXYImagePickerController *)self.navigationController;
     self.maxImagesCount = nav.maxImagesCount;
     self.progressView.numberText = [NSString stringWithFormat:@"%ld",(long)self.maxImagesCount];
@@ -437,12 +437,19 @@
         CGFloat bottomHeight = ScreenHeight - height43;
         _progressView = [[FXYCircleProgressView alloc]initWithFrame:CGRectMake(ScreenWidth * 0.5 - 40, bottomHeight * 0.5 - 40, 80, 80)];
         WEAKSELF
-        _progressView.clickBlock = ^(BOOL isStop) {
+        _progressView.clickBlock = ^(void) {
             STRONGSELF
             if (strongSelf.maxImagesCount > 0) {
                 [strongSelf.cameraManager captureStillImage];//拍照
             }
-//            isStop ? [strongSelf.cameraManager stopRecording] : [strongSelf.cameraManager startRecording];
+        };
+        _progressView.startBlock = ^{
+            STRONGSELF
+            [strongSelf.cameraManager startRecording];
+        };
+        _progressView.endBlock = ^{
+            STRONGSELF
+            [strongSelf.cameraManager stopRecording];
         };
     }
     return _progressView;

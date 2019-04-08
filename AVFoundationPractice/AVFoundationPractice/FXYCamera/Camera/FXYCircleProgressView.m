@@ -72,12 +72,13 @@ static NSTimeInterval const kTimelimit = 15.0;
  */
 - (void)singleTap:(UITapGestureRecognizer *)sender {
     if(!_needAnimation) {
-        !_clickBlock ?: _clickBlock(YES);
+        !_clickBlock ?: _clickBlock();
         return;
     }
     if (!self.displayLink.paused) {
         //暂停
         self->tempTime = self->progressTime;
+        !_endBlock ?: _endBlock();
     }else{
         //开始
         self->beginTime = CACurrentMediaTime();
@@ -85,6 +86,7 @@ static NSTimeInterval const kTimelimit = 15.0;
             self->beginTime -= self->tempTime;
             self->tempTime = 0;
         }
+        !_startBlock ?: _startBlock();
     }
     self.displayLink.paused = !self.displayLink.paused;
 }
